@@ -41,7 +41,13 @@ const CHATS = [
 
 const InboxScreen = ({ navigation }: any) => {
     const renderItem = ({ item }: any) => (
-        <TouchableOpacity style={styles.chatItem}>
+        <TouchableOpacity
+            style={styles.chatItem}
+            onPress={() => navigation.navigate('ChatDetail', {
+                shopName: item.shopName,
+                imageUrl: item.imageUrl
+            })}
+        >
             <Image source={{ uri: item.imageUrl }} style={styles.shopImage} />
             <View style={styles.content}>
                 <View style={styles.itemHeader}>

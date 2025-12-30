@@ -11,25 +11,11 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
-
-const CART_ITEMS = [
-    {
-        id: '1',
-        title: 'Apple iPhone 15 Pro 128GB Blue Titanium',
-        price: 'Rp 18.490.000',
-        imageUrl: 'https://picsum.photos/seed/p1/400/400',
-        quantity: 1,
-    },
-    {
-        id: '3',
-        title: 'Sony WH-1000XM5 Wireless Noise Cancelling',
-        price: 'Rp 4.499.000',
-        imageUrl: 'https://picsum.photos/seed/p3/400/400',
-        quantity: 1,
-    },
-];
+import { useCart } from '../../context/CartContext';
 
 const CartScreen = ({ navigation }: any) => {
+    const { cartItems, removeFromCart, updateQuantity, totalAmount } = useCart();
+
     const renderItem = ({ item }: any) => (
         <View style={styles.cartItem}>
             <View style={styles.itemHeader}>
@@ -42,15 +28,21 @@ const CartScreen = ({ navigation }: any) => {
                     <Text style={styles.itemTitle} numberOfLines={2}>{item.title}</Text>
                     <Text style={styles.itemPrice}>{item.price}</Text>
                     <View style={styles.quantityRow}>
-                        <TouchableOpacity style={styles.quantityButton}>
+                        <TouchableOpacity
+                            style={styles.quantityButton}
+                            onPress={() => updateQuantity(item.id, item.quantity - 1)}
+                        >
                             <Icon name="minus" size={normalize(16)} color={COLORS.grey} />
                         </TouchableOpacity>
                         <Text style={styles.quantityText}>{item.quantity}</Text>
-                        <TouchableOpacity style={styles.quantityButton}>
+                        <TouchableOpacity
+                            style={styles.quantityButton}
+                            onPress={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
                             <Icon name="plus" size={normalize(16)} color={COLORS.primary} />
                         </TouchableOpacity>
                         <View style={{ flex: 1 }} />
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => removeFromCart(item.id)}>
                             <Icon name="trash-2" size={normalize(20)} color={COLORS.grey} />
                         </TouchableOpacity>
                     </View>
@@ -58,6 +50,12 @@ const CartScreen = ({ navigation }: any) => {
             </View>
         </View>
     );
+
+    const formattedTotal = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+    }).format(totalAmount).replace('IDR', 'Rp');
 
     return (
         <SafeAreaView style={styles.container}>
@@ -69,7 +67,7 @@ const CartScreen = ({ navigation }: any) => {
             </View>
 
             <FlatList
-                data={CART_ITEMS}
+                data={cartItems}
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 contentContainerStyle={styles.listContainer}
@@ -87,15 +85,20 @@ const CartScreen = ({ navigation }: any) => {
                 }
             />
 
-            <View style={styles.footer}>
-                <View style={styles.totalSection}>
-                    <Text style={styles.totalLabel}>Total Harga</Text>
-                    <Text style={styles.totalValue}>Rp 22.989.000</Text>
+            {cartItems.length > 0 && (
+                <View style={styles.footer}>
+                    <View style={styles.totalSection}>
+                        <Text style={styles.totalLabel}>Total Harga</Text>
+                        <Text style={styles.totalValue}>{formattedTotal}</Text>
+                    </View>
+                    <TouchableOpacity
+                        style={styles.checkoutButton}
+                        onPress={() => navigation.navigate('Checkout')}
+                    >
+                        <Text style={styles.checkoutText}>Beli ({cartItems.length})</Text>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.checkoutButton}>
-                    <Text style={styles.checkoutText}>Beli (2)</Text>
-                </TouchableOpacity>
-            </View>
+            )}
         </SafeAreaView>
     );
 };

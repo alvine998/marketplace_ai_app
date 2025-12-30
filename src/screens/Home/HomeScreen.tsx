@@ -6,6 +6,7 @@ import {
     FlatList,
     Text,
     RefreshControl,
+    DimensionValue,
 } from 'react-native';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import HomeHeader from '../../components/Home/HomeHeader';
@@ -13,6 +14,8 @@ import BannerSlider from '../../components/Home/BannerSlider';
 import CategoryList from '../../components/Home/CategoryList';
 import ProductCard from '../../components/Home/ProductCard';
 import normalize from 'react-native-normalize';
+import { getGridColumns, isLargeScreen } from '../../utils/responsive';
+import { Dimensions } from 'react-native';
 
 const PRODUCT_DATA = [
     {
@@ -63,35 +66,41 @@ const HomeScreen = () => {
         }, 2000);
     }, []);
 
+    const numColumns = getGridColumns();
+
+    const renderHeader = () => (
+        <View>
+            <BannerSlider />
+            <CategoryList />
+            <View style={styles.productSection}>
+                <Text style={styles.sectionTitle}>Rekomendasi Untukmu</Text>
+            </View>
+        </View>
+    );
+
     return (
         <View style={styles.container}>
             <HomeHeader />
-            <ScrollView
+            <FlatList
+                data={PRODUCT_DATA}
+                keyExtractor={(item) => item.id}
+                numColumns={numColumns}
+                key={numColumns} // Force re-render if columns change
+                renderItem={({ item }) => (
+                    <View style={[styles.productItem, { width: `${100 / numColumns}%` as DimensionValue }]}>
+                        <ProductCard
+                            {...item}
+                            width="100%"
+                        />
+                    </View>
+                )}
+                ListHeaderComponent={renderHeader}
                 showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.listContent}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
-            >
-                <BannerSlider />
-                <CategoryList />
-
-                <View style={styles.productSection}>
-                    <Text style={styles.sectionTitle}>Rekomendasi Untukmu</Text>
-                    <View style={styles.productGrid}>
-                        {PRODUCT_DATA.map((item) => (
-                            <ProductCard
-                                key={item.id}
-                                title={item.title}
-                                price={item.price}
-                                location={item.location}
-                                rating={item.rating}
-                                sold={item.sold}
-                                imageUrl={item.imageUrl}
-                            />
-                        ))}
-                    </View>
-                </View>
-            </ScrollView>
+            />
         </View>
     );
 };
@@ -111,10 +120,12 @@ const styles = StyleSheet.create({
         color: COLORS.black,
         marginBottom: SPACING.md,
     },
-    productGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
+    listContent: {
+        paddingBottom: SPACING.xl,
+    },
+    productItem: {
+        paddingHorizontal: SPACING.sm,
+        marginBottom: SPACING.md,
     },
 });
 

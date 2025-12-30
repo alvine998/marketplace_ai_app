@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { memo } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, DimensionValue } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
@@ -12,15 +12,17 @@ interface ProductCardProps {
     rating: string;
     sold: string;
     imageUrl: string;
+    width?: DimensionValue;
+    containerStyle?: any;
 }
 
 const ProductCard = (props: ProductCardProps) => {
-    const { title, price, location, rating, sold, imageUrl } = props;
+    const { title, price, location, rating, sold, imageUrl, width = '48%', containerStyle } = props;
     const navigation = useNavigation<any>();
 
     return (
         <TouchableOpacity
-            style={styles.container}
+            style={[styles.container, { width }, containerStyle]}
             onPress={() => navigation.navigate('ProductDetail', { product: props })}
         >
             <Image source={{ uri: imageUrl }} style={styles.image} />
@@ -100,4 +102,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ProductCard;
+export default memo(ProductCard);

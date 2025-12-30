@@ -7,18 +7,24 @@ import Icon from 'react-native-vector-icons/Feather';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS, SPACING, SIZES } from '../utils/theme';
 import normalize from 'react-native-normalize';
+import { useAuth } from '../context/AuthContext';
 
 import HomeScreen from '../screens/Home/HomeScreen';
 import ProductDetailScreen from '../screens/ProductDetail/ProductDetailScreen';
 import CartScreen from '../screens/Cart/CartScreen';
 import NotificationScreen from '../screens/Notifications/NotificationScreen';
 import InboxScreen from '../screens/Inbox/InboxScreen';
+import ChatDetailScreen from '../screens/Inbox/ChatDetailScreen';
+import CheckoutScreen from '../screens/Checkout/CheckoutScreen';
 import WishlistScreen from '../screens/Wishlist/WishlistScreen';
 import TransactionScreen from '../screens/Transactions/TransactionScreen';
-import {
-    FeedScreen,
-    OfficialStoreScreen,
-} from '../screens/PlaceholderScreens';
+import FeedScreen from '../screens/Feed/FeedScreen';
+import OfficialStoreScreen from '../screens/OfficialStore/OfficialStoreScreen';
+import PPOBScreen from '../screens/PPOB/PPOBScreen';
+import PromoScreen from '../screens/Promo/PromoScreen';
+import CategoryProductListScreen from '../screens/Category/CategoryProductListScreen';
+import LoginScreen from '../screens/Auth/LoginScreen';
+import RegisterScreen from '../screens/Auth/RegisterScreen';
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -32,28 +38,81 @@ const HomeStack = () => {
             <Stack.Screen name="Cart" component={CartScreen} />
             <Stack.Screen name="Notifications" component={NotificationScreen} />
             <Stack.Screen name="Inbox" component={InboxScreen} />
+            <Stack.Screen name="ChatDetail" component={ChatDetailScreen} />
+            <Stack.Screen name="Checkout" component={CheckoutScreen} />
+            <Stack.Screen name="PPOB" component={PPOBScreen} />
+            <Stack.Screen name="Promo" component={PromoScreen} />
+            <Stack.Screen name="CategoryProductList" component={CategoryProductListScreen} />
         </Stack.Navigator>
     );
 };
 
-const SidebarContent = (props: any) => (
-    <View style={styles.sidebarContainer}>
-        <Text style={styles.sidebarTitle}>Menu</Text>
-        <View style={styles.divider} />
-        <TouchableOpacity style={styles.sidebarItem} onPress={() => props.navigation.closeDrawer()}>
-            <Icon name="user" size={20} color={COLORS.black} />
-            <Text style={styles.sidebarItemText}>Profil Saya</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem} onPress={() => props.navigation.closeDrawer()}>
-            <Icon name="settings" size={20} color={COLORS.black} />
-            <Text style={styles.sidebarItemText}>Pengaturan</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sidebarItem} onPress={() => props.navigation.closeDrawer()}>
-            <Icon name="help-circle" size={20} color={COLORS.black} />
-            <Text style={styles.sidebarItemText}>Bantuan</Text>
-        </TouchableOpacity>
-    </View>
-);
+const SidebarContent = (props: any) => {
+    const { isLoggedIn, user, logout } = useAuth();
+
+    return (
+        <View style={styles.sidebarContainer}>
+            {!isLoggedIn ? (
+                <View style={styles.loginSection}>
+                    <Icon name="user" size={normalize(40)} color={COLORS.lightGrey} />
+                    <Text style={styles.loginTitle}>Belum masuk?</Text>
+                    <Text style={styles.loginSubtitle}>Yuk, masuk buat menikmati fitur Marketplace!</Text>
+                    <TouchableOpacity
+                        style={styles.loginBtn}
+                        onPress={() => {
+                            props.navigation.closeDrawer();
+                            props.navigation.navigate('Login');
+                        }}
+                    >
+                        <Text style={styles.loginBtnText}>Masuk / Daftar</Text>
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                <View style={styles.profileHeader}>
+                    <View style={styles.profileIcon}>
+                        <Icon name="user" size={normalize(30)} color={COLORS.white} />
+                    </View>
+                    <View style={styles.profileInfo}>
+                        <Text style={styles.profileName}>{user?.name || 'User'}</Text>
+                        <Text style={styles.profileEmail}>{user?.email}</Text>
+                    </View>
+                </View>
+            )}
+
+            <View style={styles.divider} />
+
+            {isLoggedIn && (
+                <TouchableOpacity style={styles.sidebarItem} onPress={() => props.navigation.closeDrawer()}>
+                    <Icon name="user" size={20} color={COLORS.black} />
+                    <Text style={styles.sidebarItemText}>Profil Saya</Text>
+                </TouchableOpacity>
+            )}
+
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => props.navigation.closeDrawer()}>
+                <Icon name="settings" size={20} color={COLORS.black} />
+                <Text style={styles.sidebarItemText}>Pengaturan</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => props.navigation.closeDrawer()}>
+                <Icon name="help-circle" size={20} color={COLORS.black} />
+                <Text style={styles.sidebarItemText}>Bantuan</Text>
+            </TouchableOpacity>
+
+            {isLoggedIn && (
+                <TouchableOpacity
+                    style={[styles.sidebarItem, { marginTop: 'auto', marginBottom: SPACING.xl }]}
+                    onPress={() => {
+                        logout();
+                        props.navigation.closeDrawer();
+                    }}
+                >
+                    <Icon name="log-out" size={20} color="#FF4D4D" />
+                    <Text style={[styles.sidebarItemText, { color: '#FF4D4D' }]}>Keluar</Text>
+                </TouchableOpacity>
+            )}
+        </View>
+    );
+};
 
 const MainTabs = () => {
     return (
@@ -102,6 +161,8 @@ const RootNavigator = () => {
                 }}
             >
                 <Drawer.Screen name="MainTabs" component={MainTabs} />
+                <Drawer.Screen name="Login" component={LoginScreen} />
+                <Drawer.Screen name="Register" component={RegisterScreen} />
             </Drawer.Navigator>
         </NavigationContainer>
     );
@@ -119,6 +180,57 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: COLORS.black,
         marginBottom: SPACING.md,
+    },
+    loginSection: {
+        marginBottom: SPACING.lg,
+    },
+    loginTitle: {
+        fontSize: normalize(18),
+        fontWeight: 'bold',
+        color: COLORS.black,
+        marginTop: SPACING.sm,
+    },
+    loginSubtitle: {
+        fontSize: normalize(13),
+        color: COLORS.grey,
+        marginTop: 4,
+        marginBottom: SPACING.md,
+    },
+    loginBtn: {
+        backgroundColor: COLORS.primary,
+        paddingVertical: SPACING.sm,
+        borderRadius: SIZES.radius,
+        alignItems: 'center',
+    },
+    loginBtnText: {
+        color: COLORS.white,
+        fontWeight: 'bold',
+        fontSize: normalize(14),
+    },
+    profileHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: SPACING.md,
+    },
+    profileIcon: {
+        width: normalize(50),
+        height: normalize(50),
+        borderRadius: normalize(25),
+        backgroundColor: COLORS.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    profileInfo: {
+        marginLeft: SPACING.sm,
+    },
+    profileName: {
+        fontSize: normalize(16),
+        fontWeight: 'bold',
+        color: COLORS.black,
+    },
+    profileEmail: {
+        fontSize: normalize(12),
+        color: COLORS.grey,
     },
     divider: {
         height: 1,

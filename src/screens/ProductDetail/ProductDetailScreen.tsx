@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     View,
     Text,
@@ -9,14 +8,34 @@ import {
     SafeAreaView,
     Dimensions,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
+import { useCart } from '../../context/CartContext';
 
 const { width } = Dimensions.get('window');
 
 const ProductDetailScreen = ({ route, navigation }: any) => {
     const { product } = route.params;
+    const { addToCart } = useCart();
+
+    const handleAddToCart = () => {
+        addToCart(product);
+        Toast.show({
+            type: 'success',
+            text1: 'Berhasil',
+            text2: 'Produk ditambahkan ke keranjang',
+        });
+    };
+
+    const handleBuyNow = () => {
+        navigation.navigate('Checkout', { product });
+    };
+
+    const handleChat = () => {
+        navigation.navigate('Inbox');
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -30,7 +49,7 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
                     <TouchableOpacity style={styles.headerIcon}>
                         <Icon name="share-2" size={normalize(22)} color={COLORS.black} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.headerIcon}>
+                    <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('Cart')}>
                         <Icon name="shopping-cart" size={normalize(22)} color={COLORS.black} />
                     </TouchableOpacity>
                 </View>
@@ -79,13 +98,13 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
 
             {/* Bottom Actions */}
             <View style={styles.bottomActions}>
-                <TouchableOpacity style={styles.chatButton}>
+                <TouchableOpacity style={styles.chatButton} onPress={handleChat}>
                     <Icon name="message-circle" size={normalize(20)} color={COLORS.primary} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.addToCartButton}>
+                <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
                     <Text style={styles.addToCartText}>+ Keranjang</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buyButton}>
+                <TouchableOpacity style={styles.buyButton} onPress={handleBuyNow}>
                     <Text style={styles.buyText}>Beli Sekarang</Text>
                 </TouchableOpacity>
             </View>
