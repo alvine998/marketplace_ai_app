@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
@@ -13,9 +14,15 @@ interface ProductCardProps {
     imageUrl: string;
 }
 
-const ProductCard = ({ title, price, location, rating, sold, imageUrl }: ProductCardProps) => {
+const ProductCard = (props: ProductCardProps) => {
+    const { title, price, location, rating, sold, imageUrl } = props;
+    const navigation = useNavigation<any>();
+
     return (
-        <TouchableOpacity style={styles.container}>
+        <TouchableOpacity
+            style={styles.container}
+            onPress={() => navigation.navigate('ProductDetail', { product: props })}
+        >
             <Image source={{ uri: imageUrl }} style={styles.image} />
             <View style={styles.content}>
                 <Text style={styles.title} numberOfLines={2}>

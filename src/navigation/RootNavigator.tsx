@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
@@ -8,6 +9,10 @@ import { COLORS, SPACING, SIZES } from '../utils/theme';
 import normalize from 'react-native-normalize';
 
 import HomeScreen from '../screens/Home/HomeScreen';
+import ProductDetailScreen from '../screens/ProductDetail/ProductDetailScreen';
+import CartScreen from '../screens/Cart/CartScreen';
+import NotificationScreen from '../screens/Notifications/NotificationScreen';
+import InboxScreen from '../screens/Inbox/InboxScreen';
 import WishlistScreen from '../screens/Wishlist/WishlistScreen';
 import TransactionScreen from '../screens/Transactions/TransactionScreen';
 import {
@@ -17,6 +22,19 @@ import {
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+const Stack = createNativeStackNavigator();
+
+const HomeStack = () => {
+    return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="HomeMain" component={HomeScreen} />
+            <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+            <Stack.Screen name="Cart" component={CartScreen} />
+            <Stack.Screen name="Notifications" component={NotificationScreen} />
+            <Stack.Screen name="Inbox" component={InboxScreen} />
+        </Stack.Navigator>
+    );
+};
 
 const SidebarContent = (props: any) => (
     <View style={styles.sidebarContainer}>
@@ -63,7 +81,7 @@ const MainTabs = () => {
                 headerShown: false,
             })}
         >
-            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Home" component={HomeStack} />
             <Tab.Screen name="Feed" component={FeedScreen} />
             <Tab.Screen name="Official Store" component={OfficialStoreScreen} />
             <Tab.Screen name="Wishlist" component={WishlistScreen} />

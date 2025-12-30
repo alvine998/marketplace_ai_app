@@ -32,13 +32,22 @@ const HomeHeader = () => {
                 </TouchableOpacity>
 
                 <View style={styles.iconSection}>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity
+                        style={styles.iconButton}
+                        onPress={() => (navigation as any).navigate('Inbox')}
+                    >
                         <Icon name="mail" size={normalize(22)} color={COLORS.black} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity
+                        style={styles.iconButton}
+                        onPress={() => (navigation as any).navigate('Notifications')}
+                    >
                         <Icon name="bell" size={normalize(22)} color={COLORS.black} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity
+                        style={styles.iconButton}
+                        onPress={() => (navigation as any).navigate('Cart')}
+                    >
                         <Icon name="shopping-cart" size={normalize(22)} color={COLORS.black} />
                     </TouchableOpacity>
                     <TouchableOpacity
