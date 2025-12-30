@@ -129,9 +129,20 @@ const CategoryProductListScreen = ({ route, navigation }: any) => {
                     <Icon name="search" size={normalize(18)} color={COLORS.grey} />
                     <Text style={styles.searchPlaceholder}>Cari di {category.name}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('Cart')}>
-                    <Icon name="shopping-cart" size={normalize(22)} color={COLORS.black} />
-                </TouchableOpacity>
+                <View style={styles.headerRight}>
+                    <TouchableOpacity
+                        style={styles.headerIcon}
+                        onPress={() => navigation.navigate('Notifications')}
+                    >
+                        <Icon name="bell" size={normalize(22)} color={COLORS.black} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.headerIcon}
+                        onPress={() => navigation.navigate('Cart')}
+                    >
+                        <Icon name="shopping-cart" size={normalize(22)} color={COLORS.black} />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <SearchOverlay
@@ -230,6 +241,10 @@ const styles = StyleSheet.create({
         fontSize: normalize(14),
         color: COLORS.grey,
         marginLeft: SPACING.xs,
+    },
+    headerRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     headerIcon: {
         marginLeft: SPACING.sm,

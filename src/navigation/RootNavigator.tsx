@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS, SPACING, SIZES } from '../utils/theme';
 import normalize from 'react-native-normalize';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from '../context/LanguageContext';
 
 import HomeScreen from '../screens/Home/HomeScreen';
 import ProductDetailScreen from '../screens/ProductDetail/ProductDetailScreen';
@@ -25,6 +26,12 @@ import PromoScreen from '../screens/Promo/PromoScreen';
 import CategoryProductListScreen from '../screens/Category/CategoryProductListScreen';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
+import SettingsScreen from '../screens/Settings/SettingsScreen';
+import HelpScreen from '../screens/Help/HelpScreen';
+import HelpDetailScreen from '../screens/Help/HelpDetailScreen';
+import SplashScreen from '../screens/SplashScreen';
+import TermsScreen from '../screens/Legal/TermsScreen';
+import PrivacyPolicyScreen from '../screens/Legal/PrivacyPolicyScreen';
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -43,20 +50,24 @@ const HomeStack = () => {
             <Stack.Screen name="PPOB" component={PPOBScreen} />
             <Stack.Screen name="Promo" component={PromoScreen} />
             <Stack.Screen name="CategoryProductList" component={CategoryProductListScreen} />
+            <Stack.Screen name="Terms" component={TermsScreen} />
+            <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+            <Stack.Screen name="HelpDetail" component={HelpDetailScreen} />
         </Stack.Navigator>
     );
 };
 
 const SidebarContent = (props: any) => {
     const { isLoggedIn, user, logout } = useAuth();
+    const { t } = useTranslation();
 
     return (
         <View style={styles.sidebarContainer}>
             {!isLoggedIn ? (
                 <View style={styles.loginSection}>
                     <Icon name="user" size={normalize(40)} color={COLORS.lightGrey} />
-                    <Text style={styles.loginTitle}>Belum masuk?</Text>
-                    <Text style={styles.loginSubtitle}>Yuk, masuk buat menikmati fitur Marketplace!</Text>
+                    <Text style={styles.loginTitle}>{t('sidebar.notLoggedIn')}</Text>
+                    <Text style={styles.loginSubtitle}>{t('sidebar.loginToFeatures')}</Text>
                     <TouchableOpacity
                         style={styles.loginBtn}
                         onPress={() => {
@@ -64,7 +75,7 @@ const SidebarContent = (props: any) => {
                             props.navigation.navigate('Login');
                         }}
                     >
-                        <Text style={styles.loginBtnText}>Masuk / Daftar</Text>
+                        <Text style={styles.loginBtnText}>{t('sidebar.loginOrRegister')}</Text>
                     </TouchableOpacity>
                 </View>
             ) : (
@@ -84,18 +95,30 @@ const SidebarContent = (props: any) => {
             {isLoggedIn && (
                 <TouchableOpacity style={styles.sidebarItem} onPress={() => props.navigation.closeDrawer()}>
                     <Icon name="user" size={20} color={COLORS.black} />
-                    <Text style={styles.sidebarItemText}>Profil Saya</Text>
+                    <Text style={styles.sidebarItemText}>{t('common.profile')}</Text>
                 </TouchableOpacity>
             )}
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => props.navigation.closeDrawer()}>
+            <TouchableOpacity
+                style={styles.sidebarItem}
+                onPress={() => {
+                    props.navigation.closeDrawer();
+                    props.navigation.navigate('Settings');
+                }}
+            >
                 <Icon name="settings" size={20} color={COLORS.black} />
-                <Text style={styles.sidebarItemText}>Pengaturan</Text>
+                <Text style={styles.sidebarItemText}>{t('common.settings')}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => props.navigation.closeDrawer()}>
+            <TouchableOpacity
+                style={styles.sidebarItem}
+                onPress={() => {
+                    props.navigation.closeDrawer();
+                    props.navigation.navigate('Help');
+                }}
+            >
                 <Icon name="help-circle" size={20} color={COLORS.black} />
-                <Text style={styles.sidebarItemText}>Bantuan</Text>
+                <Text style={styles.sidebarItemText}>{t('common.help')}</Text>
             </TouchableOpacity>
 
             {isLoggedIn && (
@@ -107,7 +130,7 @@ const SidebarContent = (props: any) => {
                     }}
                 >
                     <Icon name="log-out" size={20} color="#FF4D4D" />
-                    <Text style={[styles.sidebarItemText, { color: '#FF4D4D' }]}>Keluar</Text>
+                    <Text style={[styles.sidebarItemText, { color: '#FF4D4D' }]}>{t('common.logout')}</Text>
                 </TouchableOpacity>
             )}
         </View>
@@ -135,7 +158,7 @@ const MainTabs = () => {
 
                     return <Icon name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: '#03AC0E',
+                tabBarActiveTintColor: COLORS.primary,
                 tabBarInactiveTintColor: 'gray',
                 headerShown: false,
             })}
@@ -149,21 +172,38 @@ const MainTabs = () => {
     );
 };
 
+const MainDrawer = () => {
+    return (
+        <Drawer.Navigator
+            drawerContent={(props) => <SidebarContent {...props} />}
+            screenOptions={{
+                drawerPosition: 'right',
+                headerShown: false,
+                drawerType: 'front',
+            }}
+        >
+            <Drawer.Screen name="MainTabs" component={MainTabs} />
+            <Drawer.Screen name="Login" component={LoginScreen} />
+            <Drawer.Screen name="Register" component={RegisterScreen} />
+            <Drawer.Screen name="Settings" component={SettingsScreen} />
+            <Drawer.Screen name="Help" component={HelpScreen} />
+            <Drawer.Screen name="HelpDetail" component={HelpDetailScreen} />
+            <Drawer.Screen name="TermsDrawer" component={TermsScreen} />
+            <Drawer.Screen name="PrivacyDrawer" component={PrivacyPolicyScreen} />
+        </Drawer.Navigator>
+    );
+};
+
 const RootNavigator = () => {
     return (
         <NavigationContainer>
-            <Drawer.Navigator
-                drawerContent={(props) => <SidebarContent {...props} />}
-                screenOptions={{
-                    drawerPosition: 'right',
-                    headerShown: false,
-                    drawerType: 'front',
-                }}
+            <Stack.Navigator
+                initialRouteName="Splash"
+                screenOptions={{ headerShown: false }}
             >
-                <Drawer.Screen name="MainTabs" component={MainTabs} />
-                <Drawer.Screen name="Login" component={LoginScreen} />
-                <Drawer.Screen name="Register" component={RegisterScreen} />
-            </Drawer.Navigator>
+                <Stack.Screen name="Splash" component={SplashScreen} />
+                <Stack.Screen name="Main" component={MainDrawer} />
+            </Stack.Navigator>
         </NavigationContainer>
     );
 };

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
     View,
     Text,
@@ -9,134 +10,179 @@ import {
     SafeAreaView,
     FlatList,
     Dimensions,
+    StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import ProductCard from '../../components/Home/ProductCard';
+import { useTranslation } from '../../context/LanguageContext';
 
 const { width } = Dimensions.get('window');
 
-const STORE_PRODUCT_DATA = [
+const TOP_BRANDS = [
+    { id: 'b1', name: 'Apple', logo: 'https://logo.clearbit.com/apple.com' },
+    { id: 'b2', name: 'Samsung', logo: 'https://logo.clearbit.com/samsung.com' },
+    { id: 'b3', name: 'Nike', logo: 'https://logo.clearbit.com/nike.com' },
+    { id: 'b4', name: 'Adidas', logo: 'https://logo.clearbit.com/adidas.com' },
+    { id: 'b5', name: 'Sony', logo: 'https://logo.clearbit.com/sony.com' },
+    { id: 'b6', name: 'Xiaomi', logo: 'https://logo.clearbit.com/xiaomi.com' },
+];
+
+const CAMPAIGNS = [
+    { id: 'c1', image: 'https://picsum.photos/seed/camp1/800/300', title: 'Mid Year Sale' },
+    { id: 'c2', image: 'https://picsum.photos/seed/camp2/800/300', title: 'Official Launch' },
+];
+
+const OFFICIAL_PRODUCTS = [
     {
-        id: 'os1',
-        title: 'MacBook Pro M3 Pro 14-inch 18/512GB',
-        price: 'Rp 34.999.000',
-        location: 'Jakarta Pusat',
-        rating: '5.0',
-        sold: '100+',
-        imageUrl: 'https://picsum.photos/seed/os1/400/400',
-    },
-    {
-        id: 'os2',
-        title: 'Apple Watch Series 9 GPS 45mm Starlight',
-        price: 'Rp 6.490.000',
-        location: 'Jakarta Pusat',
+        id: 'op1',
+        title: 'Air Jordan 1 Low G Mens Golf Shoes',
+        price: 'Rp 2.499.000',
+        location: 'Jakarta Barat',
         rating: '4.9',
-        sold: '500+',
-        imageUrl: 'https://picsum.photos/seed/os2/400/400',
+        sold: '50',
+        imageUrl: 'https://picsum.photos/seed/os_p1/400/400',
+        storeName: 'Nike Official Store',
     },
     {
-        id: 'os3',
-        title: 'iPad Air 5 M1 64GB Space Grey',
-        price: 'Rp 9.299.000',
-        location: 'Jakarta Pusat',
-        rating: '4.8',
-        sold: '1rb+',
-        imageUrl: 'https://picsum.photos/seed/os3/400/400',
-    },
-    {
-        id: 'os4',
-        title: 'AirPods Pro Gen 2 with MagSafe Case',
-        price: 'Rp 3.899.000',
-        location: 'Jakarta Pusat',
+        id: 'op2',
+        title: 'Sony PlayStation 5 Console - Disc Edition',
+        price: 'Rp 9.499.000',
+        location: 'Jakarta Utara',
         rating: '5.0',
-        sold: '2rb+',
-        imageUrl: 'https://picsum.photos/seed/os4/400/400',
+        sold: '100',
+        imageUrl: 'https://picsum.photos/seed/os_p2/400/400',
+        storeName: 'Sony Official Store',
+    },
+    {
+        id: 'op3',
+        title: 'Samsung Galaxy Watch6 44mm BT',
+        price: 'Rp 4.299.000',
+        location: 'Jakarta Selatan',
+        rating: '4.8',
+        sold: '200',
+        imageUrl: 'https://picsum.photos/seed/os_p3/400/400',
+        storeName: 'Samsung Official Store',
+    },
+    {
+        id: 'op4',
+        title: 'Xiaomi 13T 12/256GB Black',
+        price: 'Rp 6.499.000',
+        location: 'Jakarta Timur',
+        rating: '4.9',
+        sold: '150',
+        imageUrl: 'https://picsum.photos/seed/os_p4/400/400',
+        storeName: 'Xiaomi Official Store',
     },
 ];
 
 const OfficialStoreScreen = () => {
+    const navigation = useNavigation<any>();
+    const { t } = useTranslation();
+    const [activeTab, setActiveTab] = useState('Semua');
+
+    const renderBrandItem = ({ item }: any) => (
+        <TouchableOpacity style={styles.brandCard}>
+            <View style={styles.brandLogoContainer}>
+                <Image source={{ uri: item.logo }} style={styles.brandLogo} resizeMode="contain" />
+            </View>
+            <Text style={styles.brandItemName} numberOfLines={1}>{item.name}</Text>
+        </TouchableOpacity>
+    );
+
+    const renderHeader = () => (
+        <View style={styles.headerContent}>
+            {/* Top Brands Section */}
+            <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Top Brands</Text>
+                <TouchableOpacity>
+                    <Text style={styles.seeAllText}>Lihat Semua</Text>
+                </TouchableOpacity>
+            </View>
+            <FlatList
+                data={TOP_BRANDS}
+                renderItem={renderBrandItem}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.brandsList}
+            />
+
+            {/* Campaign Banner */}
+            <ScrollView
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                style={styles.bannerScroller}
+            >
+                {CAMPAIGNS.map((camp) => (
+                    <TouchableOpacity key={camp.id} activeOpacity={0.9}>
+                        <Image source={{ uri: camp.image }} style={styles.bannerImage} />
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
+
+            {/* Category Tabs */}
+            <View style={styles.tabsContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContent}>
+                    {['Semua', 'Elektronik', 'Fashion', 'Olahraga', 'Gadget', 'Gaming'].map((tab) => (
+                        <TouchableOpacity
+                            key={tab}
+                            style={[styles.tab, activeTab === tab && styles.activeTab]}
+                            onPress={() => setActiveTab(tab)}
+                        >
+                            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>{tab}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            </View>
+        </View>
+    );
+
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.searchSection}>
-                    <Icon name="search" size={20} color={COLORS.grey} />
-                    <Text style={styles.placeholderText}>Cari di Official Store...</Text>
+            <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
+
+            {/* Nav Header */}
+            <View style={styles.navHeader}>
+                <View style={styles.searchBar}>
+                    <Icon name="search" size={18} color={COLORS.grey} />
+                    <Text style={styles.searchText}>Cari di Official Store...</Text>
                 </View>
                 <View style={styles.headerIcons}>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.navigate('Cart')}>
                         <Icon name="shopping-cart" size={normalize(22)} color={COLORS.black} />
+                        <View style={styles.badge}><Text style={styles.badgeText}>3</Text></View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.navigate('Notifications')}>
                         <Icon name="bell" size={normalize(22)} color={COLORS.black} />
+                        <View style={styles.dot} />
                     </TouchableOpacity>
                 </View>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Store Branding */}
-                <View style={styles.bannerContainer}>
-                    <Image
-                        source={{ uri: 'https://picsum.photos/seed/osbanner/800/400' }}
-                        style={styles.banner}
-                    />
-                    <View style={styles.storeProfile}>
-                        <Image
-                            source={{ uri: 'https://picsum.photos/seed/oslogo/200/200' }}
-                            style={styles.storeLogo}
+            <FlatList
+                data={OFFICIAL_PRODUCTS}
+                keyExtractor={(item) => item.id}
+                numColumns={2}
+                ListHeaderComponent={renderHeader}
+                renderItem={({ item }) => (
+                    <View style={styles.productWrapper}>
+                        <ProductCard
+                            {...item}
+                            width="100%"
                         />
-                        <View style={styles.storeInfo}>
-                            <View style={styles.storeNameRow}>
-                                <Text style={styles.storeName}>iBox Official Store</Text>
-                                <Icon name="check-circle" size={16} color="#03AC0E" style={styles.verifiedIcon} />
-                            </View>
-                            <Text style={styles.storeSubtitle}>9.2jt Pengikut • Jakarta Pusat</Text>
+                        <View style={styles.officialBadgeContainer}>
+                            <Icon name="check-circle" size={12} color={COLORS.primary} />
+                            <Text style={styles.officialText}>Official Store</Text>
                         </View>
-                        <TouchableOpacity style={styles.followButton}>
-                            <Text style={styles.followButtonText}>Follow</Text>
-                        </TouchableOpacity>
                     </View>
-                </View>
-
-                {/* Categories */}
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    style={styles.categoriesContainer}
-                    contentContainerStyle={styles.categoriesContent}
-                >
-                    {['Semua', 'iPhone', 'Mac', 'iPad', 'Watch', 'Accessories'].map((cat, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={[styles.categoryTab, index === 0 && styles.activeCategoryTab]}
-                        >
-                            <Text style={[styles.categoryTabText, index === 0 && styles.activeCategoryTabText]}>{cat}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
-
-                {/* Products */}
-                <View style={styles.productSection}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Produk Unggulan</Text>
-                        <Text style={styles.seeAllText}>Lihat Semua</Text>
-                    </View>
-                    <View style={styles.productGrid}>
-                        {STORE_PRODUCT_DATA.map((item) => (
-                            <ProductCard
-                                key={item.id}
-                                title={item.title}
-                                price={item.price}
-                                location={item.location}
-                                rating={item.rating}
-                                sold={item.sold}
-                                imageUrl={item.imageUrl}
-                            />
-                        ))}
-                    </View>
-                </View>
-            </ScrollView>
+                )}
+                contentContainerStyle={styles.listContent}
+                columnWrapperStyle={styles.columnWrapper}
+                showsVerticalScrollIndicator={false}
+            />
         </SafeAreaView>
     );
 };
@@ -144,129 +190,78 @@ const OfficialStoreScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
+        backgroundColor: '#F8F9FA',
     },
-    header: {
+    navHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: SPACING.md,
         paddingVertical: SPACING.sm,
+        backgroundColor: COLORS.white,
         borderBottomWidth: 1,
         borderBottomColor: COLORS.border,
     },
-    searchSection: {
+    searchBar: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.searchBarBackground,
+        backgroundColor: '#F0F3F7',
         borderRadius: SIZES.radius,
         paddingHorizontal: SPACING.sm,
-        height: normalize(36),
+        height: normalize(38),
     },
-    placeholderText: {
-        fontSize: normalize(14),
-        color: COLORS.grey,
+    searchText: {
         marginLeft: SPACING.xs,
+        color: COLORS.grey,
+        fontSize: normalize(14),
     },
     headerIcons: {
         flexDirection: 'row',
         marginLeft: SPACING.sm,
     },
-    iconButton: {
-        marginLeft: SPACING.sm,
+    iconBtn: {
+        marginLeft: SPACING.md,
+        position: 'relative',
     },
-    bannerContainer: {
-        marginBottom: SPACING.md,
-    },
-    banner: {
-        width: width,
-        height: normalize(150),
-        resizeMode: 'cover',
-    },
-    storeProfile: {
-        flexDirection: 'row',
+    badge: {
+        position: 'absolute',
+        top: -4,
+        right: -6,
+        backgroundColor: '#FF4D4D',
+        borderRadius: 10,
+        minWidth: 16,
+        height: 16,
+        justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: SPACING.md,
-        marginTop: -normalize(30),
+        paddingHorizontal: 2,
     },
-    storeLogo: {
-        width: normalize(70),
-        height: normalize(70),
-        borderRadius: normalize(35),
-        borderWidth: 3,
-        borderColor: COLORS.white,
-        backgroundColor: COLORS.lightGrey,
-    },
-    storeInfo: {
-        flex: 1,
-        marginLeft: SPACING.sm,
-        marginTop: normalize(20),
-    },
-    storeNameRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    storeName: {
-        fontSize: normalize(16),
-        fontWeight: 'bold',
-        color: COLORS.black,
-    },
-    verifiedIcon: {
-        marginLeft: 4,
-    },
-    storeSubtitle: {
-        fontSize: normalize(12),
-        color: COLORS.grey,
-        marginTop: 2,
-    },
-    followButton: {
-        backgroundColor: COLORS.primary,
-        paddingHorizontal: SPACING.md,
-        paddingVertical: normalize(6),
-        borderRadius: SIZES.radius,
-        marginTop: normalize(20),
-    },
-    followButtonText: {
+    badgeText: {
         color: COLORS.white,
+        fontSize: normalize(10),
         fontWeight: 'bold',
-        fontSize: normalize(13),
     },
-    categoriesContainer: {
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
-    },
-    categoriesContent: {
-        paddingHorizontal: SPACING.md,
-        paddingVertical: SPACING.sm,
-    },
-    categoryTab: {
-        paddingHorizontal: SPACING.md,
-        paddingVertical: normalize(6),
-        borderRadius: 20,
-        marginRight: SPACING.sm,
+    dot: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#FF4D4D',
         borderWidth: 1,
-        borderColor: COLORS.border,
+        borderColor: COLORS.white,
     },
-    activeCategoryTab: {
-        backgroundColor: COLORS.primary + '20',
-        borderColor: COLORS.primary,
-    },
-    categoryTabText: {
-        fontSize: normalize(14),
-        color: COLORS.grey,
-    },
-    activeCategoryTabText: {
-        color: COLORS.primary,
-        fontWeight: 'bold',
-    },
-    productSection: {
-        padding: SPACING.md,
+    headerContent: {
+        backgroundColor: COLORS.white,
+        paddingBottom: SPACING.md,
     },
     sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: SPACING.md,
+        paddingHorizontal: SPACING.md,
+        paddingTop: SPACING.md,
+        marginBottom: SPACING.sm,
     },
     sectionTitle: {
         fontSize: normalize(16),
@@ -278,10 +273,108 @@ const styles = StyleSheet.create({
         color: COLORS.primary,
         fontWeight: 'bold',
     },
-    productGrid: {
+    brandsList: {
+        paddingHorizontal: SPACING.md,
+        paddingBottom: SPACING.md,
+    },
+    brandCard: {
+        alignItems: 'center',
+        marginRight: SPACING.lg,
+        width: normalize(60),
+    },
+    brandLogoContainer: {
+        width: normalize(54),
+        height: normalize(54),
+        borderRadius: normalize(27),
+        backgroundColor: COLORS.white,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+    },
+    brandLogo: {
+        width: '70%',
+        height: '70%',
+    },
+    brandItemName: {
+        marginTop: 6,
+        fontSize: normalize(11),
+        color: COLORS.black,
+        textAlign: 'center',
+    },
+    bannerScroller: {
+        paddingVertical: SPACING.sm,
+    },
+    bannerImage: {
+        width: width - (SPACING.md * 2),
+        height: normalize(120),
+        borderRadius: SIZES.radius,
+        marginHorizontal: SPACING.md,
+        resizeMode: 'cover',
+    },
+    tabsContainer: {
+        marginTop: SPACING.sm,
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.border,
+    },
+    tabsContent: {
+        paddingHorizontal: SPACING.md,
+        paddingBottom: SPACING.sm,
+    },
+    tab: {
+        paddingHorizontal: SPACING.md,
+        paddingVertical: normalize(6),
+        borderRadius: 20,
+        marginRight: SPACING.sm,
+    },
+    activeTab: {
+        backgroundColor: COLORS.primary + '15',
+    },
+    tabText: {
+        fontSize: normalize(14),
+        color: COLORS.grey,
+    },
+    activeTabText: {
+        color: COLORS.primary,
+        fontWeight: 'bold',
+    },
+    listContent: {
+        paddingBottom: SPACING.xl,
+    },
+    columnWrapper: {
+        paddingHorizontal: SPACING.sm,
+    },
+    productWrapper: {
+        flex: 0.5,
+        padding: SPACING.xs,
+        backgroundColor: COLORS.white,
+        marginBottom: SPACING.sm,
+        marginHorizontal: SPACING.xs,
+        borderRadius: SIZES.radius,
+        elevation: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 1,
+    },
+    officialBadgeContainer: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: SPACING.xs,
+        paddingBottom: SPACING.xs,
+        marginTop: -SPACING.xs,
+    },
+    officialText: {
+        fontSize: normalize(10),
+        color: COLORS.primary,
+        fontWeight: '600',
+        marginLeft: 2,
     },
 });
 

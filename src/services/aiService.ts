@@ -1,8 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// Note: In a production app, this should be handled on the backend
-// For this demo, we use a placeholder or provided API key
-const API_KEY = process.env.GOOGLE_API_KEY || "";
+import { GOOGLE_API_KEY as API_KEY } from "../config/env";
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
@@ -18,7 +15,12 @@ export const searchWithAI = async (query: string) => {
         return searchCache[trimmedQuery];
     }
 
-    const modelsToTry = ["gemini-2.5-flash"];
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash-lite", "gemini-3-flash"];
+
+    if (!API_KEY) {
+        console.error("CRITICAL: GOOGLE_API_KEY is not defined in your environment.");
+        return [];
+    }
 
     for (const modelName of modelsToTry) {
         try {
@@ -49,4 +51,43 @@ export const searchWithAI = async (query: string) => {
     }
 
     return [];
+};
+
+export const getHelpFromAI = async (query: string) => {
+    const trimmedQuery = query.trim().toLowerCase();
+
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3-flash"];
+
+    if (!API_KEY) {
+        console.error("CRITICAL: GOOGLE_API_KEY is not defined in your environment.");
+        return { title: "Error", content: "Konfigurasi API AI belum lengkap. Harap periksa setelan aplikasi." };
+    }
+
+    for (const modelName of modelsToTry) {
+        try {
+            console.log(`Trying Gemini model for help: ${modelName}`);
+            const model = genAI.getGenerativeModel({ model: modelName });
+
+            const prompt = `You are a helpful customer support assistant for a marketplace app like Tokopedia. 
+            The user is asking about: "${query}".
+            Provide a detailed, helpful, and concise answer or explanation.
+            If the query is a category like "Akun" or "Pembayaran", provide an overview of help topics in that category.
+            Format the response as a JSON object with keys: title, content.
+            Return ONLY the JSON object, no other text.`;
+
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const text = response.text();
+
+            const jsonMatch = text.match(/\{.*\}/s);
+            if (jsonMatch) {
+                const parsedResult = JSON.parse(jsonMatch[0]);
+                return parsedResult;
+            }
+        } catch (error) {
+            console.error(`Gemini Help Error with ${modelName}:`, error);
+        }
+    }
+
+    return { title: "Error", content: "Maaf, terjadi kesalahan saat mengambil informasi bantuan." };
 };

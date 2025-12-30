@@ -1,0 +1,44 @@
+{
+  "common": {
+    "search": "Search...",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "logout": "Logout",
+    "settings": "Settings",
+    "help": "Help",
+    "profile": "My Profile",
+    "login": "Login",
+    "register": "Register",
+    "home": "Home",
+    "feed": "Feed",
+    "officialStore": "Official Store",
+    "wishlist": "Wishlist",
+    "transactions": "Transactions",
+    "cart": "Cart",
+    "notifications": "Notifications",
+    "recommendation": "Recommended for You"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "application": "Application",
+    "about": "About",
+    "security": "Account Security",
+    "address": "My Address",
+    "language": "Language",
+    "chooseLanguage": "Choose Language",
+    "selectLanguage": "Please select your preferred language",
+    "darkMode": "Dark Mode",
+    "notification": "Notifications",
+    "terms": "Terms and Conditions",
+    "privacy": "Privacy Policy",
+    "version": "App Version",
+    "deleteAccount": "Delete Account"
+  },
+  "sidebar": {
+    "notLoggedIn": "Not logged in?",
+    "loginToFeatures": "Join us to enjoy all Marketplace features!",
+    "loginOrRegister": "Login / Register"
+  }
+}

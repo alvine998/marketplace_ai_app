@@ -40,7 +40,7 @@ const RegisterScreen = ({ navigation }: any) => {
         }
 
         // Mock Registration
-        login({ name: fullName, email });
+        login({ id: Date.now().toString(), name: fullName, email, avatar: 'https://i.pravatar.cc/150?u=' + email });
         navigation.navigate('MainTabs');
         Toast.show({
             type: 'success',
@@ -104,7 +104,7 @@ const RegisterScreen = ({ navigation }: any) => {
                         {isAgreed && <Icon name="check" size={12} color={COLORS.white} />}
                     </View>
                     <Text style={styles.checkboxLabel}>
-                        Saya menyetujui <Text style={styles.link}>Syarat & Ketentuan</Text> serta <Text style={styles.link}>Kebijakan Privasi</Text> Marketplace.
+                        Saya menyetujui <Text style={styles.link} onPress={() => navigation.navigate('Terms')}>Syarat & Ketentuan</Text> serta <Text style={styles.link} onPress={() => navigation.navigate('PrivacyPolicy')}>Kebijakan Privasi</Text> Marketplace.
                     </Text>
                 </TouchableOpacity>
 

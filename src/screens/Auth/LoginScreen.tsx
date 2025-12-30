@@ -30,7 +30,7 @@ const LoginScreen = ({ navigation }: any) => {
         }
 
         // Mock Login
-        login({ name: 'John Doe', email });
+        login({ id: '1', name: 'John Doe', email });
         navigation.navigate('MainTabs');
         Toast.show({
             type: 'success',

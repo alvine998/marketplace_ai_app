@@ -6,12 +6,13 @@ import {
     Image,
     FlatList,
     TouchableOpacity,
-    SafeAreaView,
     Dimensions,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -49,6 +50,7 @@ const FEED_DATA = [
 ];
 
 const FeedScreen = () => {
+    const navigation = useNavigation<any>();
     const renderFeedItem = ({ item }: any) => (
         <View style={styles.feedCard}>
             {/* Header */}
@@ -103,7 +105,7 @@ const FeedScreen = () => {
                     <TouchableOpacity style={styles.headerIcon}>
                         <Icon name="search" size={normalize(22)} color={COLORS.black} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.headerIcon}>
+                    <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('Cart')}>
                         <Icon name="shopping-cart" size={normalize(22)} color={COLORS.black} />
                     </TouchableOpacity>
                 </View>

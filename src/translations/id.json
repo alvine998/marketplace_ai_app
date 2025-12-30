@@ -1,0 +1,44 @@
+{
+  "common": {
+    "search": "Cari...",
+    "back": "Kembali",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "logout": "Keluar",
+    "settings": "Pengaturan",
+    "help": "Bantuan",
+    "profile": "Profil Saya",
+    "login": "Masuk",
+    "register": "Daftar",
+    "home": "Beranda",
+    "feed": "Feed",
+    "officialStore": "Official Store",
+    "wishlist": "Wishlist",
+    "transactions": "Transaksi",
+    "cart": "Keranjang",
+    "notifications": "Notifikasi",
+    "recommendation": "Rekomendasi Untukmu"
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "account": "Akun",
+    "application": "Aplikasi",
+    "about": "Tentang",
+    "security": "Keamanan Akun",
+    "address": "Alamat Saya",
+    "language": "Bahasa",
+    "chooseLanguage": "Pilih Bahasa",
+    "selectLanguage": "Silakan pilih bahasa yang ingin digunakan",
+    "darkMode": "Mode Gelap",
+    "notification": "Notifikasi",
+    "terms": "Syarat dan Ketentuan",
+    "privacy": "Kebijakan Privasi",
+    "version": "Versi Aplikasi",
+    "deleteAccount": "Hapus Akun"
+  },
+  "sidebar": {
+    "notLoggedIn": "Belum masuk?",
+    "loginToFeatures": "Yuk, masuk buat menikmati fitur Marketplace!",
+    "loginOrRegister": "Masuk / Daftar"
+  }
+}

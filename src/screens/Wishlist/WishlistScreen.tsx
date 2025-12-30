@@ -6,12 +6,13 @@ import {
     FlatList,
     Image,
     TouchableOpacity,
-    SafeAreaView,
     RefreshControl,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import Icon from 'react-native-vector-icons/Feather';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const WISHLIST_DATA = [
     {
@@ -38,6 +39,7 @@ const WISHLIST_DATA = [
 ];
 
 const WishlistScreen = () => {
+    const navigation = useNavigation<any>();
     const [refreshing, setRefreshing] = React.useState(false);
 
     const onRefresh = React.useCallback(() => {
@@ -74,7 +76,7 @@ const WishlistScreen = () => {
                     <TouchableOpacity style={styles.iconButton}>
                         <Icon name="search" size={22} color={COLORS.black} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Cart')}>
                         <Icon name="shopping-cart" size={22} color={COLORS.black} />
                     </TouchableOpacity>
                 </View>

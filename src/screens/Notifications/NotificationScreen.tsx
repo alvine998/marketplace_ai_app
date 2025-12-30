@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -10,6 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
+import { notificationService, Notification } from '../../services/notificationService';
 
 const NOTIFICATIONS = [
     {
@@ -39,15 +40,33 @@ const NOTIFICATIONS = [
 ];
 
 const NotificationScreen = ({ navigation }: any) => {
-    const renderItem = ({ item }: any) => (
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const fetchNotifications = async () => {
+        setLoading(true);
+        const data = await notificationService.getNotifications();
+        setNotifications(data);
+        setLoading(false);
+    };
+
+    const renderItem = ({ item }: { item: Notification }) => (
         <TouchableOpacity style={styles.notificationItem}>
-            <View style={[styles.iconContainer, (styles as any)[item.type]]}>
-                <Icon name={item.icon} size={normalize(20)} color={COLORS.white} />
+            <View style={[styles.iconContainer, (styles as any)[item.type] || styles.info]}>
+                <Icon
+                    name={item.type === 'order' ? 'package' : item.type === 'promo' ? 'zap' : 'message-circle'}
+                    size={normalize(20)}
+                    color={COLORS.white}
+                />
             </View>
             <View style={styles.content}>
                 <View style={styles.itemHeader}>
                     <Text style={styles.itemTitle}>{item.title}</Text>
-                    <Text style={styles.itemTime}>{item.time}</Text>
+                    <Text style={styles.itemTime}>Baru saja</Text>
                 </View>
                 <Text style={styles.itemMessage} numberOfLines={2}>{item.message}</Text>
             </View>
@@ -76,7 +95,7 @@ const NotificationScreen = ({ navigation }: any) => {
             </View>
 
             <FlatList
-                data={NOTIFICATIONS}
+                data={notifications}
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 contentContainerStyle={styles.listContainer}

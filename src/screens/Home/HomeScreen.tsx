@@ -16,6 +16,7 @@ import ProductCard from '../../components/Home/ProductCard';
 import normalize from 'react-native-normalize';
 import { getGridColumns, isLargeScreen } from '../../utils/responsive';
 import { Dimensions } from 'react-native';
+import { useTranslation } from '../../context/LanguageContext';
 
 const PRODUCT_DATA = [
     {
@@ -57,6 +58,7 @@ const PRODUCT_DATA = [
 ];
 
 const HomeScreen = () => {
+    const { t } = useTranslation();
     const [refreshing, setRefreshing] = React.useState(false);
 
     const onRefresh = React.useCallback(() => {
@@ -73,7 +75,7 @@ const HomeScreen = () => {
             <BannerSlider />
             <CategoryList />
             <View style={styles.productSection}>
-                <Text style={styles.sectionTitle}>Rekomendasi Untukmu</Text>
+                <Text style={styles.sectionTitle}>{t('common.recommendation')}</Text>
             </View>
         </View>
     );

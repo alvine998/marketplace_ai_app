@@ -1,6 +1,6 @@
 export const COLORS = {
-    primary: '#03AC0E',
-    secondary: '#FF57()', // Discount/Promo color
+    primary: '#0066cb',
+    secondary: '#ffcc33',
     white: '#FFFFFF',
     black: '#212121',
     grey: '#808080',

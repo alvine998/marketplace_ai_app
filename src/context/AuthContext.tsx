@@ -1,10 +1,18 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+
+interface User {
+    id: string;
+    name: string;
+    email: string;
+    fcmToken?: string;
+}
 
 interface AuthContextType {
     isLoggedIn: boolean;
-    user: any;
-    login: (userData: any) => void;
+    user: User | null;
+    login: (userData: User) => void;
     logout: () => void;
+    updateFcmToken: (token: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,8 +31,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null);
     };
 
+    const updateFcmToken = (token: string) => {
+        if (user) {
+            setUser({ ...user, fcmToken: token });
+        }
+    };
+
+
     return (
-        <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, user, login, logout, updateFcmToken }}>
             {children}
         </AuthContext.Provider>
     );
