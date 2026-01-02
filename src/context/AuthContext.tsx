@@ -4,6 +4,7 @@ interface User {
     id: string;
     name: string;
     email: string;
+    avatar?: string;
     fcmToken?: string;
 }
 
@@ -19,9 +20,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
 
-    const login = (userData: any) => {
+    const login = (userData: User) => {
         setIsLoggedIn(true);
         setUser(userData);
     };

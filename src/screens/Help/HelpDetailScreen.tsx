@@ -26,16 +26,10 @@ const HelpDetailScreen = ({ route, navigation }: any) => {
     }, [query]);
 
     const fetchAIHelp = async () => {
-        setLoading(true);
-        try {
-            const result = await getHelpFromAI(query);
-            setContent(result.content);
-            if (!title) setDisplayTitle(result.title);
-        } catch (error) {
-            setContent('Maaf, kami menemui masalah saat memuat informasi ini. Silakan coba lagi nanti.');
-        } finally {
-            setLoading(false);
-        }
+        // AI Help fetch disabled
+        console.log('AI Help fetch is currently disabled');
+        setContent('Maaf, informasi bantuan untuk topik ini belum tersedia.');
+        setLoading(false);
     };
 
     return (

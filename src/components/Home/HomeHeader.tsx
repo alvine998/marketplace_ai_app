@@ -18,31 +18,49 @@ const HomeHeader = () => {
     const navigation = useNavigation<DrawerNavigationProp<any>>();
     const [searchVisible, setSearchVisible] = React.useState(false);
 
+    // Mock unread counts
+    const unreadMessages = 2;
+    const unreadNotifications = 5;
+
+    const renderBadge = (count: number) => {
+        if (count <= 0) return null;
+        return (
+            <View style={styles.badge}>
+                <Text style={styles.badgeText}>{count > 99 ? '99+' : count}</Text>
+            </View>
+        );
+    };
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>
-                <TouchableOpacity
+                <View
                     style={styles.searchSection}
-                    onPress={() => setSearchVisible(true)}
                 >
                     <Icon name="search" size={20} color={COLORS.grey} style={styles.searchIcon} />
                     <View style={styles.inputPlaceholder}>
-                        <Text style={styles.placeholderText}>Cari dengan AI Gemini...</Text>
+                        <Text style={styles.placeholderText}>Cari di marketplace...</Text>
                     </View>
-                </TouchableOpacity>
+                </View>
 
                 <View style={styles.iconSection}>
                     <TouchableOpacity
                         style={styles.iconButton}
                         onPress={() => (navigation as any).navigate('Inbox')}
                     >
-                        <Icon name="mail" size={normalize(22)} color={COLORS.black} />
+                        <View>
+                            <Icon name="mail" size={normalize(22)} color={COLORS.black} />
+                            {renderBadge(unreadMessages)}
+                        </View>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.iconButton}
                         onPress={() => (navigation as any).navigate('Notifications')}
                     >
-                        <Icon name="bell" size={normalize(22)} color={COLORS.black} />
+                        <View>
+                            <Icon name="bell" size={normalize(22)} color={COLORS.black} />
+                            {renderBadge(unreadNotifications)}
+                        </View>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.iconButton}
@@ -111,6 +129,26 @@ const styles = StyleSheet.create({
     iconButton: {
         padding: SPACING.xs,
         marginLeft: SPACING.xs,
+    },
+    badge: {
+        position: 'absolute',
+        top: -4,
+        right: -4,
+        backgroundColor: '#FF4D4D',
+        borderRadius: normalize(8),
+        minWidth: normalize(16),
+        height: normalize(16),
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 2,
+        borderWidth: 1.5,
+        borderColor: COLORS.white,
+    },
+    badgeText: {
+        color: COLORS.white,
+        fontSize: normalize(9),
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

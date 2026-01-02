@@ -39,9 +39,9 @@ const SearchOverlay = ({ visible, onClose }: SearchOverlayProps) => {
     }, [query]);
 
     const handleSearch = async (searchQuery: string) => {
-        setLoading(true);
-        const aiResults = await searchWithAI(searchQuery);
-        setResults(aiResults);
+        // AI Search disabled
+        console.log('AI Search is currently disabled');
+        setResults([]);
         setLoading(false);
     };
 
@@ -65,7 +65,7 @@ const SearchOverlay = ({ visible, onClose }: SearchOverlayProps) => {
                     <View style={styles.searchSection}>
                         <TextInput
                             style={styles.input}
-                            placeholder="Cari dengan AI..."
+                            placeholder="Cari..."
                             value={query}
                             onChangeText={setQuery}
                             autoFocus
@@ -80,7 +80,7 @@ const SearchOverlay = ({ visible, onClose }: SearchOverlayProps) => {
 
                 <View style={styles.content}>
                     <Text style={styles.sectionTitle}>
-                        {loading ? 'Mencari dengan AI...' : results.length > 0 ? 'Sesuai pencarianmu' : 'Coba cari "Sepatu lari terbaik"'}
+                        {loading ? 'Sedang mencari...' : results.length > 0 ? 'Sesuai pencarianmu' : 'Coba cari "Sepatu lari"'}
                     </Text>
 
                     {loading ? (

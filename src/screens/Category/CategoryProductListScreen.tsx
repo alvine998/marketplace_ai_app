@@ -122,13 +122,12 @@ const CategoryProductListScreen = ({ route, navigation }: any) => {
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Icon name="arrow-left" size={normalize(24)} color={COLORS.black} />
                 </TouchableOpacity>
-                <TouchableOpacity
+                <View
                     style={styles.searchBar}
-                    onPress={() => setSearchVisible(true)}
                 >
                     <Icon name="search" size={normalize(18)} color={COLORS.grey} />
                     <Text style={styles.searchPlaceholder}>Cari di {category.name}</Text>
-                </TouchableOpacity>
+                </View>
                 <View style={styles.headerRight}>
                     <TouchableOpacity
                         style={styles.headerIcon}

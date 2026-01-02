@@ -17,6 +17,7 @@ import normalize from 'react-native-normalize';
 import { getGridColumns, isLargeScreen } from '../../utils/responsive';
 import { Dimensions } from 'react-native';
 import { useTranslation } from '../../context/LanguageContext';
+import PromotionModal from '../../components/Home/PromotionModal';
 
 const PRODUCT_DATA = [
     {
@@ -57,9 +58,18 @@ const PRODUCT_DATA = [
     },
 ];
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }: any) => {
     const { t } = useTranslation();
     const [refreshing, setRefreshing] = React.useState(false);
+    const [promoVisible, setPromoVisible] = React.useState(false);
+
+    React.useEffect(() => {
+        // Show promo modal after 1.5s delay
+        const timer = setTimeout(() => {
+            setPromoVisible(true);
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, []);
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
@@ -102,6 +112,14 @@ const HomeScreen = () => {
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
+            />
+            <PromotionModal
+                visible={promoVisible}
+                onClose={() => setPromoVisible(false)}
+                onPressCTA={() => {
+                    setPromoVisible(false);
+                    navigation.navigate('PromotionDetail');
+                }}
             />
         </View>
     );

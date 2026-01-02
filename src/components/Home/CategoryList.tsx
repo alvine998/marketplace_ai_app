@@ -11,12 +11,11 @@ const ITEM_WIDTH = (SCREEN_WIDTH - (SPACING.md * 2)) / 4;
 
 const CATEGORIES = [
     { id: 1, name: 'Promo Hari Ini', icon: 'zap' },
-    { id: 3, name: 'Top-Up & Tagihan', icon: 'file-text' },
     { id: 4, name: 'Elektronik', icon: 'tv' },
     { id: 5, name: 'Fashion Pria', icon: 'user' },
     { id: 6, name: 'Fashion Wanita', icon: 'heart' },
     { id: 7, name: 'Rumah Tangga', icon: 'home' },
-    { id: 8, name: 'Kecantikan', icon: 'smile' }, // Changed face-smile to smile for Feather
+    { id: 8, name: 'Kecantikan', icon: 'smile' },
     { id: 2, name: 'Lihat Semua', icon: 'grid' },
 ];
 
@@ -33,8 +32,8 @@ const CategoryList = () => {
                         onPress={() => {
                             if (category.id === 1) {
                                 navigation.navigate('Promo');
-                            } else if (category.id === 2 || category.id === 3) {
-                                navigation.navigate('PPOB');
+                            } else if (category.id === 2) {
+                                navigation.navigate('AllCategories');
                             } else {
                                 navigation.navigate('CategoryProductList', { category });
                             }

@@ -66,7 +66,10 @@ const NotificationScreen = ({ navigation }: any) => {
             <View style={styles.content}>
                 <View style={styles.itemHeader}>
                     <Text style={styles.itemTitle}>{item.title}</Text>
-                    <Text style={styles.itemTime}>Baru saja</Text>
+                    <View style={styles.rightContent}>
+                        <Text style={styles.itemTime}>Baru saja</Text>
+                        {!item.isRead && <View style={styles.unreadDot} />}
+                    </View>
                 </View>
                 <Text style={styles.itemMessage} numberOfLines={2}>{item.message}</Text>
             </View>
@@ -190,6 +193,17 @@ const styles = StyleSheet.create({
     itemTime: {
         fontSize: normalize(12),
         color: COLORS.grey,
+    },
+    rightContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    unreadDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#FF4D4D',
+        marginLeft: SPACING.sm,
     },
     itemMessage: {
         fontSize: normalize(13),

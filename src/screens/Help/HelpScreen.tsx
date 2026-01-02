@@ -40,15 +40,9 @@ const HelpScreen = ({ navigation }: any) => {
     const handleSearch = async (text: string) => {
         setSearchQuery(text);
         if (text.length > 3) {
-            setLoading(true);
-            try {
-                const result = await getHelpFromAI(text);
-                setAiResult(result);
-            } catch (error) {
-                console.error('AI Help Error:', error);
-            } finally {
-                setLoading(false);
-            }
+            // AI Help Search disabled
+            console.log('AI Help Search is currently disabled');
+            setAiResult(null);
         } else {
             setAiResult(null);
         }
@@ -84,26 +78,7 @@ const HelpScreen = ({ navigation }: any) => {
                     </View>
                 </View>
 
-                {aiResult && (
-                    <View style={styles.aiResultSection}>
-                        <Text style={styles.sectionHeader}>Hasil Pencarian AI</Text>
-                        <TouchableOpacity
-                            style={styles.aiResultCard}
-                            onPress={() => navigateToDetail(aiResult.title, searchQuery, aiResult.content)}
-                        >
-                            <View style={styles.aiIconWrapper}>
-                                <Icon name="zap" size={normalize(20)} color={COLORS.white} />
-                            </View>
-                            <View style={styles.aiResultInfo}>
-                                <Text style={styles.aiResultTitle}>{aiResult.title}</Text>
-                                <Text style={styles.aiResultSnippet} numberOfLines={2}>
-                                    {aiResult.content}
-                                </Text>
-                            </View>
-                            <Icon name="chevron-right" size={normalize(20)} color={COLORS.grey} />
-                        </TouchableOpacity>
-                    </View>
-                )}
+                {/* AI Result Section Disabled */}
 
                 {/* FAQ Categories */}
                 <View style={styles.section}>

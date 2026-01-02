@@ -17,13 +17,17 @@ import NotificationScreen from '../screens/Notifications/NotificationScreen';
 import InboxScreen from '../screens/Inbox/InboxScreen';
 import ChatDetailScreen from '../screens/Inbox/ChatDetailScreen';
 import CheckoutScreen from '../screens/Checkout/CheckoutScreen';
+import PaymentSuccessScreen from '../screens/Checkout/PaymentSuccessScreen';
 import WishlistScreen from '../screens/Wishlist/WishlistScreen';
 import TransactionScreen from '../screens/Transactions/TransactionScreen';
 import FeedScreen from '../screens/Feed/FeedScreen';
 import OfficialStoreScreen from '../screens/OfficialStore/OfficialStoreScreen';
-import PPOBScreen from '../screens/PPOB/PPOBScreen';
 import PromoScreen from '../screens/Promo/PromoScreen';
+import PromotionDetailScreen from '../screens/Promo/PromotionDetailScreen';
+import AddressListScreen from '../screens/Address/AddressListScreen';
+import AddAddressScreen from '../screens/Address/AddAddressScreen';
 import CategoryProductListScreen from '../screens/Category/CategoryProductListScreen';
+import AllCategoriesScreen from '../screens/Category/AllCategoriesScreen';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
 import SettingsScreen from '../screens/Settings/SettingsScreen';
@@ -47,9 +51,13 @@ const HomeStack = () => {
             <Stack.Screen name="Inbox" component={InboxScreen} />
             <Stack.Screen name="ChatDetail" component={ChatDetailScreen} />
             <Stack.Screen name="Checkout" component={CheckoutScreen} />
-            <Stack.Screen name="PPOB" component={PPOBScreen} />
+            <Stack.Screen name="PaymentSuccess" component={PaymentSuccessScreen} />
             <Stack.Screen name="Promo" component={PromoScreen} />
+            <Stack.Screen name="PromotionDetail" component={PromotionDetailScreen} />
+            <Stack.Screen name="AddressList" component={AddressListScreen} />
+            <Stack.Screen name="AddAddress" component={AddAddressScreen} />
             <Stack.Screen name="CategoryProductList" component={CategoryProductListScreen} />
+            <Stack.Screen name="AllCategories" component={AllCategoriesScreen} />
             <Stack.Screen name="Terms" component={TermsScreen} />
             <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
             <Stack.Screen name="HelpDetail" component={HelpDetailScreen} />
