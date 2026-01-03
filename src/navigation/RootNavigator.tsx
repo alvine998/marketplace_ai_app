@@ -26,6 +26,7 @@ import PromoScreen from '../screens/Promo/PromoScreen';
 import PromotionDetailScreen from '../screens/Promo/PromotionDetailScreen';
 import AddressListScreen from '../screens/Address/AddressListScreen';
 import AddAddressScreen from '../screens/Address/AddAddressScreen';
+import BecomeSellerScreen from '../screens/Seller/BecomeSellerScreen';
 import CategoryProductListScreen from '../screens/Category/CategoryProductListScreen';
 import AllCategoriesScreen from '../screens/Category/AllCategoriesScreen';
 import LoginScreen from '../screens/Auth/LoginScreen';
@@ -56,6 +57,7 @@ const HomeStack = () => {
             <Stack.Screen name="PromotionDetail" component={PromotionDetailScreen} />
             <Stack.Screen name="AddressList" component={AddressListScreen} />
             <Stack.Screen name="AddAddress" component={AddAddressScreen} />
+            <Stack.Screen name="BecomeSeller" component={BecomeSellerScreen} />
             <Stack.Screen name="CategoryProductList" component={CategoryProductListScreen} />
             <Stack.Screen name="AllCategories" component={AllCategoriesScreen} />
             <Stack.Screen name="Terms" component={TermsScreen} />
@@ -95,6 +97,23 @@ const SidebarContent = (props: any) => {
                         <Text style={styles.profileName}>{user?.name || 'User'}</Text>
                         <Text style={styles.profileEmail}>{user?.email}</Text>
                     </View>
+                </View>
+            )}
+
+            <View style={styles.divider} />
+
+            {isLoggedIn && (
+                <View style={styles.sellerSection}>
+                    <TouchableOpacity
+                        style={styles.sellerBtn}
+                        onPress={() => {
+                            props.navigation.closeDrawer();
+                            props.navigation.navigate('BecomeSeller');
+                        }}
+                    >
+                        <Icon name="shopping-bag" size={normalize(20)} color={COLORS.primary} />
+                        <Text style={styles.sellerBtnText}>Buka Toko Gratis</Text>
+                    </TouchableOpacity>
                 </View>
             )}
 
@@ -284,6 +303,24 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: COLORS.border,
         marginBottom: SPACING.md,
+    },
+    sellerSection: {
+        marginBottom: SPACING.md,
+    },
+    sellerBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLORS.primary + '15',
+        padding: SPACING.md,
+        borderRadius: SIZES.radius,
+        borderWidth: 1,
+        borderColor: COLORS.primary + '30',
+    },
+    sellerBtnText: {
+        fontSize: normalize(14),
+        fontWeight: 'bold',
+        color: COLORS.primary,
+        marginLeft: SPACING.sm,
     },
     sidebarItem: {
         flexDirection: 'row',

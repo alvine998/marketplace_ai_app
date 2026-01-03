@@ -7,11 +7,13 @@ import {
     Text,
     RefreshControl,
     DimensionValue,
+    TouchableOpacity,
 } from 'react-native';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import HomeHeader from '../../components/Home/HomeHeader';
 import BannerSlider from '../../components/Home/BannerSlider';
 import CategoryList from '../../components/Home/CategoryList';
+import Icon from 'react-native-vector-icons/Feather';
 import ProductCard from '../../components/Home/ProductCard';
 import normalize from 'react-native-normalize';
 import { getGridColumns, isLargeScreen } from '../../utils/responsive';
@@ -84,6 +86,23 @@ const HomeScreen = ({ navigation }: any) => {
         <View>
             <BannerSlider />
             <CategoryList />
+
+            <View style={styles.sellerPromotion}>
+                <View style={styles.sellerPromoLeft}>
+                    <Icon name="shopping-bag" size={normalize(24)} color={COLORS.primary} />
+                    <View style={styles.sellerPromoTextContainer}>
+                        <Text style={styles.sellerPromoTitle}>Mulai Berjualan Yuk!</Text>
+                        <Text style={styles.sellerPromoSubtitle}>Buka tokomu sekarang, gratis!</Text>
+                    </View>
+                </View>
+                <TouchableOpacity
+                    style={styles.sellerPromoBtn}
+                    onPress={() => navigation.navigate('BecomeSeller')}
+                >
+                    <Text style={styles.sellerPromoBtnText}>Buka Toko</Text>
+                </TouchableOpacity>
+            </View>
+
             <View style={styles.productSection}>
                 <Text style={styles.sectionTitle}>{t('common.recommendation')}</Text>
             </View>
@@ -139,6 +158,46 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: COLORS.black,
         marginBottom: SPACING.md,
+    },
+    sellerPromotion: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: COLORS.primary + '10',
+        marginHorizontal: SPACING.md,
+        marginTop: SPACING.lg,
+        padding: SPACING.md,
+        borderRadius: SIZES.radius,
+        borderWidth: 1,
+        borderColor: COLORS.primary + '30',
+    },
+    sellerPromoLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    sellerPromoTextContainer: {
+        marginLeft: SPACING.sm,
+    },
+    sellerPromoTitle: {
+        fontSize: normalize(14),
+        fontWeight: 'bold',
+        color: COLORS.black,
+    },
+    sellerPromoSubtitle: {
+        fontSize: normalize(12),
+        color: COLORS.grey,
+    },
+    sellerPromoBtn: {
+        backgroundColor: COLORS.primary,
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.xs,
+        borderRadius: normalize(20),
+    },
+    sellerPromoBtnText: {
+        color: COLORS.white,
+        fontSize: normalize(12),
+        fontWeight: 'bold',
     },
     listContent: {
         paddingBottom: SPACING.xl,
