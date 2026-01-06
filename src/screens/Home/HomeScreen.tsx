@@ -16,7 +16,7 @@ import CategoryList from '../../components/Home/CategoryList';
 import Icon from 'react-native-vector-icons/Feather';
 import ProductCard from '../../components/Home/ProductCard';
 import normalize from 'react-native-normalize';
-import { getGridColumns, isLargeScreen } from '../../utils/responsive';
+import { useResponsive } from '../../utils/responsive';
 import { Dimensions } from 'react-native';
 import { useTranslation } from '../../context/LanguageContext';
 import PromotionModal from '../../components/Home/PromotionModal';
@@ -80,7 +80,7 @@ const HomeScreen = ({ navigation }: any) => {
         }, 2000);
     }, []);
 
-    const numColumns = getGridColumns();
+    const { columns, width: screenWidth } = useResponsive();
 
     const renderHeader = () => (
         <View>
@@ -115,10 +115,10 @@ const HomeScreen = ({ navigation }: any) => {
             <FlatList
                 data={PRODUCT_DATA}
                 keyExtractor={(item) => item.id}
-                numColumns={numColumns}
-                key={numColumns} // Force re-render if columns change
+                numColumns={columns}
+                key={columns} // Force re-render if columns change
                 renderItem={({ item }) => (
-                    <View style={[styles.productItem, { width: `${100 / numColumns}%` as DimensionValue }]}>
+                    <View style={[styles.productItem, { width: `${100 / columns}%` as DimensionValue }]}>
                         <ProductCard
                             {...item}
                             width="100%"

@@ -1,13 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useNavigation } from '@react-navigation/native';
-
-const { width } = Dimensions.get('window');
-const SCREEN_WIDTH = width;
-const ITEM_WIDTH = (SCREEN_WIDTH - (SPACING.md * 2)) / 4;
+import { useResponsive } from '../../utils/responsive';
 
 const CATEGORIES = [
     { id: 1, name: 'Promo Hari Ini', icon: 'zap' },
@@ -21,6 +18,11 @@ const CATEGORIES = [
 
 const CategoryList = () => {
     const navigation = useNavigation<any>();
+    const { width, columns } = useResponsive();
+
+    // On wider screens, show more categories per row
+    const itemsPerRow = width > 700 ? 6 : width > 500 ? 5 : 4;
+    const itemWidth = (width - (SPACING.md * 2)) / itemsPerRow;
 
     return (
         <View style={styles.container}>
@@ -28,7 +30,7 @@ const CategoryList = () => {
                 {CATEGORIES.map((category) => (
                     <TouchableOpacity
                         key={category.id}
-                        style={styles.categoryItem}
+                        style={[styles.categoryItem, { width: itemWidth }]}
                         onPress={() => {
                             if (category.id === 1) {
                                 navigation.navigate('Promo');
@@ -63,7 +65,6 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     categoryItem: {
-        width: ITEM_WIDTH,
         alignItems: 'center',
         marginBottom: SPACING.md,
     },
@@ -80,6 +81,7 @@ const styles = StyleSheet.create({
         fontSize: normalize(10),
         color: COLORS.black,
         textAlign: 'center',
+        paddingHorizontal: 4,
     },
 });
 

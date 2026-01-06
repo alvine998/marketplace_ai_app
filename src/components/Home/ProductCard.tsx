@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, DimensionValue } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { COLORS, SPACING, SIZES } from '../../utils/theme';
+import { COLORS, SPACING, SIZES, SHADOWS } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 
 interface ProductCardProps {
@@ -24,6 +24,7 @@ const ProductCard = (props: ProductCardProps) => {
         <TouchableOpacity
             style={[styles.container, { width }, containerStyle]}
             onPress={() => navigation.navigate('ProductDetail', { product: props })}
+            activeOpacity={0.9}
         >
             <Image source={{ uri: imageUrl }} style={styles.image} />
             <View style={styles.content}>
@@ -33,10 +34,12 @@ const ProductCard = (props: ProductCardProps) => {
                 <Text style={styles.price}>{price}</Text>
                 <Text style={styles.location}>{location}</Text>
                 <View style={styles.ratingRow}>
-                    <Icon name="star" size={normalize(12)} color="#FFC107" />
-                    <Text style={styles.ratingText}>{rating}</Text>
+                    <View style={styles.ratingInfo}>
+                        <Icon name="star" size={normalize(12)} color="#FFC107" />
+                        <Text style={styles.ratingText}>{rating}</Text>
+                    </View>
                     <View style={styles.divider} />
-                    <Text style={styles.soldText}>Terjual {sold}</Text>
+                    <Text style={styles.soldText}>{sold} terjual</Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -45,20 +48,17 @@ const ProductCard = (props: ProductCardProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: '48%',
         backgroundColor: COLORS.cardBackground,
         borderRadius: SIZES.radius,
         marginBottom: SPACING.md,
         overflow: 'hidden',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
+        ...SHADOWS.soft,
+        borderWidth: 1,
+        borderColor: COLORS.border,
     },
     image: {
         width: '100%',
-        height: normalize(150),
+        height: normalize(160), // Slightly taller for premium feel
         resizeMode: 'cover',
     },
     content: {
@@ -69,12 +69,13 @@ const styles = StyleSheet.create({
         color: COLORS.black,
         marginBottom: SPACING.xs,
         height: normalize(36),
+        lineHeight: normalize(18),
     },
     price: {
         fontSize: normalize(15),
         fontWeight: 'bold',
         color: COLORS.black,
-        marginBottom: SPACING.xs,
+        marginBottom: 4,
     },
     location: {
         fontSize: normalize(11),
@@ -85,16 +86,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    ratingInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     ratingText: {
         fontSize: normalize(11),
-        color: COLORS.grey,
+        color: COLORS.black,
+        fontWeight: '500',
         marginLeft: 4,
     },
     divider: {
         width: 1,
         height: normalize(10),
         backgroundColor: COLORS.border,
-        marginHorizontal: 6,
+        marginHorizontal: 8,
     },
     soldText: {
         fontSize: normalize(11),

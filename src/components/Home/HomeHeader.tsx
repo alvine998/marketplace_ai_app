@@ -34,14 +34,16 @@ const HomeHeader = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>
-                <View
+                <TouchableOpacity
                     style={styles.searchSection}
+                    onPress={() => setSearchVisible(true)}
+                    activeOpacity={0.7}
                 >
                     <Icon name="search" size={20} color={COLORS.grey} style={styles.searchIcon} />
                     <View style={styles.inputPlaceholder}>
                         <Text style={styles.placeholderText}>Cari di marketplace...</Text>
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 <View style={styles.iconSection}>
                     <TouchableOpacity
