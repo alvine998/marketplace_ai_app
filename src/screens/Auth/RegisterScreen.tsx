@@ -7,6 +7,9 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
+    Dimensions,
+    KeyboardAvoidingView,
+    Platform,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/Feather';
@@ -14,34 +17,30 @@ import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useAuth } from '../../context/AuthContext';
 
+const { width } = Dimensions.get('window');
+
 const RegisterScreen = ({ navigation }: any) => {
     const { login } = useAuth();
     const [fullName, setFullName] = useState('');
-    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [gender, setGender] = useState('');
+    const [address, setAddress] = useState('');
     const [password, setPassword] = useState('');
-    const [isAgreed, setIsAgreed] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleRegister = () => {
-        if (!fullName || !email || !password) {
+        if (!fullName || !phone || !password) {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Silakan lengkapi semua data',
-            });
-            return;
-        }
-        if (!isAgreed) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Kamu harus menyetujui syarat dan ketentuan',
+                text2: 'Silakan lengkapi data wajib',
             });
             return;
         }
 
         // Mock Registration
-        login({ id: Date.now().toString(), name: fullName, email, avatar: 'https://i.pravatar.cc/150?u=' + email });
-        navigation.navigate('MainTabs');
+        login({ id: Date.now().toString(), name: fullName, phone });
+        navigation.navigate('Main');
         Toast.show({
             type: 'success',
             text1: 'Sukses',
@@ -50,76 +49,117 @@ const RegisterScreen = ({ navigation }: any) => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Icon name="arrow-left" size={normalize(24)} color={COLORS.black} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Daftar</Text>
-                <View style={{ width: 24 }} />
+        <View style={styles.container}>
+            {/* 2-Layer Header */}
+            <View style={styles.headerContainer}>
+                <View style={styles.headerLayerAccent} />
+                <SafeAreaView style={{ flex: 1 }}>
+                    <View style={styles.headerTop}>
+                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                            <Icon name="arrow-left" size={normalize(24)} color={COLORS.white} />
+                        </TouchableOpacity>
+                        <Text style={styles.headerTitle}>Daftar</Text>
+                        <View style={{ width: normalize(24) }} />
+                    </View>
+                </SafeAreaView>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-                <Text style={styles.welcomeText}>Buat Akun Marketplace</Text>
-                <Text style={styles.subText}>Daftar sekarang dan nikmati kemudahan belanja</Text>
-
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Nama Lengkap</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Contoh: John Doe"
-                        value={fullName}
-                        onChangeText={setFullName}
-                    />
-                </View>
-
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Email atau Nomor Ponsel</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Contoh: john@email.com"
-                        value={email}
-                        onChangeText={setEmail}
-                        autoCapitalize="none"
-                    />
-                </View>
-
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Password</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Minimal 6 karakter"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                    />
-                </View>
-
-                <TouchableOpacity
-                    style={styles.checkboxContainer}
-                    onPress={() => setIsAgreed(!isAgreed)}
-                    activeOpacity={0.7}
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={styles.keyboardView}
                 >
-                    <View style={[styles.checkbox, isAgreed && styles.checkboxActive]}>
-                        {isAgreed && <Icon name="check" size={12} color={COLORS.white} />}
+                    {/* Avatar Placeholder */}
+                    <View style={styles.avatarContainer}>
+                        <View style={styles.avatarCircle}>
+                            <Icon name="user" size={normalize(60)} color="#EFEFEF" />
+                        </View>
                     </View>
-                    <Text style={styles.checkboxLabel}>
-                        Saya menyetujui <Text style={styles.link} onPress={() => navigation.navigate('Terms')}>Syarat & Ketentuan</Text> serta <Text style={styles.link} onPress={() => navigation.navigate('PrivacyPolicy')}>Kebijakan Privasi</Text> Marketplace.
-                    </Text>
-                </TouchableOpacity>
 
-                <TouchableOpacity style={styles.registerBtn} onPress={handleRegister}>
-                    <Text style={styles.registerBtnText}>Daftar</Text>
-                </TouchableOpacity>
+                    {/* Form Fields */}
+                    <View style={styles.form}>
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Nama lengkap"
+                                placeholderTextColor="#A0A0A0"
+                                value={fullName}
+                                onChangeText={setFullName}
+                            />
+                        </View>
 
-                <View style={styles.footer}>
-                    <Text style={styles.footerText}>Sudah punya akun? </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                        <Text style={styles.loginLink}>Masuk</Text>
-                    </TouchableOpacity>
-                </View>
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="No. Telphone"
+                                placeholderTextColor="#A0A0A0"
+                                value={phone}
+                                onChangeText={setPhone}
+                                keyboardType="phone-pad"
+                            />
+                        </View>
+
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Jenis Kelamin"
+                                placeholderTextColor="#A0A0A0"
+                                value={gender}
+                                onChangeText={setGender}
+                            />
+                        </View>
+
+                        <View style={[styles.inputWrapper, { height: normalize(100), alignItems: 'flex-start', paddingTop: SPACING.sm }]}>
+                            <TextInput
+                                style={[styles.input, { textAlignVertical: 'top', height: '100%' }]}
+                                placeholder="Alamat"
+                                placeholderTextColor="#A0A0A0"
+                                value={address}
+                                onChangeText={setAddress}
+                                multiline
+                            />
+                        </View>
+
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                style={[styles.input, { paddingRight: normalize(40) }]}
+                                placeholder="Password"
+                                placeholderTextColor="#A0A0A0"
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry={!showPassword}
+                            />
+                            <TouchableOpacity
+                                style={styles.eyeIcon}
+                                onPress={() => setShowPassword(!showPassword)}
+                            >
+                                <Icon
+                                    name={showPassword ? 'eye' : 'eye-off'}
+                                    size={normalize(20)}
+                                    color="#B3B3B3"
+                                />
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Terms & Conditions */}
+                        <Text style={styles.termsText}>
+                            Dengan mengklik daftar, anda menyetujui{' '}
+                            <Text style={styles.blueLink} onPress={() => navigation.navigate('Terms')}>Ketentuan</Text>,{' '}
+                            <Text style={styles.blueLink} onPress={() => navigation.navigate('PrivacyPolicy')}>Kebijakan Data</Text> dan{' '}
+                            <Text style={styles.blueLink} onPress={() => navigation.navigate('PrivacyPolicy')}>Kebijakan Cookie</Text> kami.
+                            Anda akan Menerima Notifikasi SMS dari Vibes dan dapat menolaknya kapan saja
+                        </Text>
+
+                        {/* Submit Button */}
+                        <TouchableOpacity style={styles.registerBtn} onPress={handleRegister}>
+                            <Text style={styles.registerBtnText}>Daftar</Text>
+                        </TouchableOpacity>
+
+                        <Text style={styles.footerText}>Daftar untuk menggunakan aplikasi</Text>
+                    </View>
+                </KeyboardAvoidingView>
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };
 
@@ -128,105 +168,139 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.white,
     },
-    header: {
+    headerContainer: {
+        backgroundColor: '#1E56C5',
+        height: normalize(100),
+        justifyContent: 'flex-start',
+        position: 'relative',
+        overflow: 'hidden',
+    },
+    headerLayerBase: {
+        position: 'absolute',
+        top: -normalize(40),
+        left: -normalize(20),
+        right: -normalize(20),
+        height: normalize(100),
+        backgroundColor: '#154AB4',
+        borderBottomLeftRadius: width * 1,
+        borderBottomRightRadius: width * 1,
+        transform: [{ scaleX: 1.2 }],
+    },
+    headerLayerAccent: {
+        position: 'absolute',
+        top: -normalize(60),
+        left: -normalize(10),
+        right: -normalize(10),
+        height: normalize(120),
+        backgroundColor: '#2A67E2',
+        // borderBottomLeftRadius: width * 0.4,
+        borderBottomRightRadius: width * 0.8,
+        opacity: 0.8,
+        transform: [{ scaleX: 1.1 }],
+    },
+    headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: SPACING.md,
-        height: normalize(56),
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
+        marginTop: SPACING.sm,
+    },
+    backBtn: {
+        padding: SPACING.xs,
     },
     headerTitle: {
-        fontSize: normalize(18),
-        fontWeight: 'bold',
-        color: COLORS.black,
-    },
-    content: {
-        padding: SPACING.lg,
-    },
-    welcomeText: {
         fontSize: normalize(20),
         fontWeight: 'bold',
-        color: COLORS.black,
-        marginBottom: 8,
+        color: COLORS.white,
     },
-    subText: {
-        fontSize: normalize(14),
-        color: COLORS.grey,
-        marginBottom: SPACING.xl,
+    wave: {
+        position: 'absolute',
+        bottom: -normalize(40),
+        left: 0,
+        right: 0,
+        height: normalize(80),
+        backgroundColor: '#1E56C5',
+        borderBottomLeftRadius: width * 0.5,
+        borderBottomRightRadius: width * 0.5,
+        transform: [{ scaleX: 1.5 }],
     },
-    inputGroup: {
-        marginBottom: SPACING.md,
+    scrollContent: {
+        flexGrow: 1,
+        paddingTop: normalize(20),
     },
-    label: {
-        fontSize: normalize(12),
-        fontWeight: 'bold',
-        color: COLORS.grey,
-        marginBottom: 4,
+    keyboardView: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    avatarContainer: {
+        marginVertical: SPACING.sm,
+    },
+    avatarCircle: {
+        width: normalize(120),
+        height: normalize(120),
+        borderRadius: normalize(60),
+        backgroundColor: '#F5F7FA',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#EFEFEF',
+    },
+    form: {
+        width: '100%',
+        paddingHorizontal: SPACING.xl,
+        paddingBottom: SPACING.xl,
+    },
+    inputWrapper: {
+        width: '100%',
+        backgroundColor: '#F7F8FA',
+        borderRadius: normalize(12),
+        height: normalize(52),
+        justifyContent: 'center',
+        paddingHorizontal: SPACING.md,
+        marginVertical: SPACING.sm,
     },
     input: {
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
-        height: normalize(40),
         fontSize: normalize(16),
         color: COLORS.black,
     },
-    checkboxContainer: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginVertical: SPACING.lg,
+    eyeIcon: {
+        position: 'absolute',
+        right: SPACING.md,
     },
-    checkbox: {
-        width: 18,
-        height: 18,
-        borderRadius: 4,
-        borderWidth: 1,
-        borderColor: COLORS.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 8,
-        marginTop: 2,
-    },
-    checkboxActive: {
-        backgroundColor: COLORS.primary,
-    },
-    checkboxLabel: {
-        flex: 1,
+    termsText: {
         fontSize: normalize(12),
-        color: COLORS.grey,
-        lineHeight: 18,
+        color: COLORS.black,
+        textAlign: 'left',
+        marginTop: SPACING.md,
+        lineHeight: normalize(18),
     },
-    link: {
-        color: COLORS.primary,
-        fontWeight: 'bold',
+    blueLink: {
+        color: '#1E56C5',
+        fontWeight: '600',
     },
     registerBtn: {
-        backgroundColor: COLORS.primary,
-        height: normalize(48),
-        borderRadius: SIZES.radius,
+        backgroundColor: '#154AB4',
+        height: normalize(52),
+        borderRadius: normalize(12),
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: SPACING.sm,
+        marginTop: SPACING.xl,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
     },
     registerBtnText: {
         color: COLORS.white,
+        fontSize: normalize(20),
         fontWeight: 'bold',
-        fontSize: normalize(16),
-    },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginTop: SPACING.xl,
     },
     footerText: {
         fontSize: normalize(14),
-        color: COLORS.grey,
-    },
-    loginLink: {
-        fontSize: normalize(14),
-        fontWeight: 'bold',
-        color: COLORS.primary,
+        color: COLORS.black,
+        textAlign: 'center',
+        marginTop: SPACING.md,
     },
 });
 

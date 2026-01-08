@@ -13,12 +13,63 @@ import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useCart } from '../../context/CartContext';
+import ProductCard from '../../components/Home/ProductCard';
+import ShopRecommendations from '../../components/Home/ShopRecommendations';
 
 const { width } = Dimensions.get('window');
 
+const MOCK_REVIEWS = [
+    {
+        id: 'r1',
+        user: 'Alvin E.',
+        rating: 5,
+        date: '2 hari lalu',
+        comment: 'Barangnya asli, pengiriman cepat sekali. Packing sangat aman dengan bubble wrap tebal. Recommended seller!',
+        avatar: 'https://picsum.photos/seed/u1/100/100',
+    },
+    {
+        id: 'r2',
+        user: 'Budi S.',
+        rating: 4,
+        date: '1 minggu lalu',
+        comment: 'Kualitas produk sangat baik, sesuai deskripsi. Cuma agak telat dikit di kurirnya saja.',
+        avatar: 'https://picsum.photos/seed/u2/100/100',
+    },
+];
+
+const OTHER_PRODUCTS = [
+    {
+        id: 'opp1',
+        title: 'Premium Leather Wallet',
+        price: 'Rp 450.000',
+        location: 'Jakarta Pusat',
+        rating: '4.8',
+        sold: '200+',
+        imageUrl: 'https://picsum.photos/seed/op1/400/400',
+    },
+    {
+        id: 'opp2',
+        title: 'Minimalist Desktop Mat',
+        price: 'Rp 125.000',
+        location: 'Tangerang',
+        rating: '4.9',
+        sold: '1.2rb+',
+        imageUrl: 'https://picsum.photos/seed/op2/400/400',
+    },
+    {
+        id: 'opp3',
+        title: 'Ergonomic Office Chair',
+        price: 'Rp 2.199.000',
+        location: 'Bekasi',
+        rating: '4.7',
+        sold: '50+',
+        imageUrl: 'https://picsum.photos/seed/op3/400/400',
+    },
+];
+
 const ProductDetailScreen = ({ route, navigation }: any) => {
     const { product } = route.params;
-    const { addToCart } = useCart();
+    const { addToCart, itemCount } = useCart();
 
     const handleAddToCart = () => {
         addToCart(product);
@@ -50,7 +101,14 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
                         <Icon name="share-2" size={normalize(22)} color={COLORS.black} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('Cart')}>
-                        <Icon name="shopping-cart" size={normalize(22)} color={COLORS.black} />
+                        <View>
+                            <Icon name="shopping-cart" size={normalize(22)} color={COLORS.black} />
+                            {itemCount > 0 && (
+                                <View style={styles.badge}>
+                                    <Text style={styles.badgeText}>{itemCount > 99 ? '99+' : itemCount}</Text>
+                                </View>
+                            )}
+                        </View>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -93,6 +151,71 @@ const ProductDetailScreen = ({ route, navigation }: any) => {
                     <Text style={styles.description}>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                     </Text>
+
+                    <View style={styles.infoDivider} />
+
+                    <ShopRecommendations />
+
+                    <View style={styles.infoDivider} />
+
+                    {/* Reviews Section */}
+                    <View style={styles.reviewHeader}>
+                        <Text style={styles.sectionTitle}>Ulasan Pembeli</Text>
+                        <TouchableOpacity>
+                            <Text style={styles.seeAllText}>Lihat Semua</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.ratingSummary}>
+                        <View style={styles.ratingLeft}>
+                            <Text style={styles.ratingMain}>4.9</Text>
+                            <Text style={styles.ratingMax}>/ 5.0</Text>
+                        </View>
+                        <View style={styles.ratingRight}>
+                            <View style={styles.starRow}>
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                    <Icon key={s} name="star" size={normalize(14)} color="#FFC107" style={{ marginRight: 2 }} />
+                                ))}
+                            </View>
+                            <Text style={styles.totalRatingText}>98% pembeli merasa puas</Text>
+                        </View>
+                    </View>
+
+                    {MOCK_REVIEWS.map((review) => (
+                        <View key={review.id} style={styles.reviewItem}>
+                            <View style={styles.reviewUserRow}>
+                                <Image source={{ uri: review.avatar }} style={styles.reviewerAvatar} />
+                                <View style={styles.reviewerInfo}>
+                                    <Text style={styles.reviewerName}>{review.user}</Text>
+                                    <View style={styles.reviewerMeta}>
+                                        <View style={styles.starRow}>
+                                            {[1, 2, 3, 4, 5].map((s) => (
+                                                <Icon key={s} name="star" size={normalize(10)} color={s <= review.rating ? "#FFC107" : COLORS.lightGrey} />
+                                            ))}
+                                        </View>
+                                        <Text style={styles.reviewDate}>{review.date}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            <Text style={styles.reviewComment}>{review.comment}</Text>
+                        </View>
+                    ))}
+
+                    <View style={styles.infoDivider} />
+
+                    {/* Recommendations Section */}
+                    <Text style={styles.sectionTitle}>Lainnya di Pretty Shop</Text>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.recommendationList}
+                    >
+                        {OTHER_PRODUCTS.map((item) => (
+                            <View key={item.id} style={styles.recommendationItem}>
+                                <ProductCard {...item} width={normalize(150)} />
+                            </View>
+                        ))}
+                    </ScrollView>
                 </View>
             </ScrollView>
 
@@ -213,6 +336,99 @@ const styles = StyleSheet.create({
         color: COLORS.grey,
         lineHeight: normalize(20),
     },
+    reviewHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: SPACING.md,
+    },
+    seeAllText: {
+        fontSize: normalize(14),
+        color: COLORS.primary,
+        fontWeight: 'bold',
+    },
+    ratingSummary: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FAFAFA',
+        padding: SPACING.md,
+        borderRadius: SIZES.radius,
+        marginBottom: SPACING.lg,
+    },
+    ratingLeft: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        borderRightWidth: 1,
+        borderRightColor: COLORS.border,
+        paddingRight: SPACING.md,
+        marginRight: SPACING.md,
+    },
+    ratingMain: {
+        fontSize: normalize(32),
+        fontWeight: 'bold',
+        color: COLORS.black,
+    },
+    ratingMax: {
+        fontSize: normalize(14),
+        color: COLORS.grey,
+        marginLeft: 4,
+    },
+    ratingRight: {
+        flex: 1,
+    },
+    starRow: {
+        flexDirection: 'row',
+        marginBottom: 4,
+    },
+    totalRatingText: {
+        fontSize: normalize(12),
+        color: COLORS.grey,
+    },
+    reviewItem: {
+        marginBottom: SPACING.lg,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
+        paddingBottom: SPACING.md,
+    },
+    reviewUserRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: SPACING.sm,
+    },
+    reviewerAvatar: {
+        width: normalize(36),
+        height: normalize(36),
+        borderRadius: normalize(18),
+    },
+    reviewerInfo: {
+        marginLeft: SPACING.sm,
+    },
+    reviewerName: {
+        fontSize: normalize(14),
+        fontWeight: 'bold',
+        color: COLORS.black,
+    },
+    reviewerMeta: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    reviewDate: {
+        fontSize: normalize(12),
+        color: COLORS.grey,
+        marginLeft: SPACING.sm,
+    },
+    reviewComment: {
+        fontSize: normalize(13),
+        color: COLORS.black,
+        lineHeight: normalize(18),
+    },
+    recommendationList: {
+        paddingRight: SPACING.md,
+        marginTop: SPACING.sm,
+    },
+    recommendationItem: {
+        marginRight: SPACING.md,
+    },
     bottomActions: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -258,6 +474,26 @@ const styles = StyleSheet.create({
         fontSize: normalize(14),
         fontWeight: 'bold',
         color: COLORS.white,
+    },
+    badge: {
+        position: 'absolute',
+        top: -4,
+        right: -4,
+        backgroundColor: '#FF4D4D',
+        borderRadius: normalize(8),
+        minWidth: normalize(16),
+        height: normalize(16),
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 2,
+        borderWidth: 1.5,
+        borderColor: COLORS.white,
+    },
+    badgeText: {
+        color: COLORS.white,
+        fontSize: normalize(9),
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

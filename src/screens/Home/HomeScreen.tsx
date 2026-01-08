@@ -20,6 +20,7 @@ import { useResponsive } from '../../utils/responsive';
 import { Dimensions } from 'react-native';
 import { useTranslation } from '../../context/LanguageContext';
 import PromotionModal from '../../components/Home/PromotionModal';
+import PrettyShopPromo from '../../components/Home/PrettyShopPromo';
 
 const PRODUCT_DATA = [
     {
@@ -84,9 +85,6 @@ const HomeScreen = ({ navigation }: any) => {
 
     const renderHeader = () => (
         <View>
-            <BannerSlider />
-            <CategoryList />
-
             <View style={styles.sellerPromotion}>
                 <View style={styles.sellerPromoLeft}>
                     <Icon name="shopping-bag" size={normalize(24)} color={COLORS.primary} />
@@ -102,7 +100,10 @@ const HomeScreen = ({ navigation }: any) => {
                     <Text style={styles.sellerPromoBtnText}>Buka Toko</Text>
                 </TouchableOpacity>
             </View>
+            <BannerSlider />
 
+            <CategoryList />
+            <PrettyShopPromo />
             <View style={styles.productSection}>
                 <Text style={styles.sectionTitle}>{t('common.recommendation')}</Text>
             </View>

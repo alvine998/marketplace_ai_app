@@ -7,6 +7,10 @@ import {
     TouchableOpacity,
     SafeAreaView,
     Image,
+    Dimensions,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/Feather';
@@ -14,24 +18,27 @@ import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useAuth } from '../../context/AuthContext';
 
+const { width, height } = Dimensions.get('window');
+
 const LoginScreen = ({ navigation }: any) => {
     const { login } = useAuth();
-    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = () => {
-        if (!email || !password) {
+        if (!phone || !password) {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Silakan isi email dan password',
+                text2: 'Silakan isi nomor ponsel dan password',
             });
             return;
         }
 
         // Mock Login
-        login({ id: '1', name: 'John Doe', email });
-        navigation.navigate('MainTabs');
+        login({ id: '1', name: 'Alvin', email: 'alvin@example.com' });
+        navigation.navigate('Main');
         Toast.show({
             type: 'success',
             text1: 'Sukses',
@@ -40,178 +47,219 @@ const LoginScreen = ({ navigation }: any) => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Icon name="x" size={normalize(24)} color={COLORS.black} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Masuk</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                    <Text style={styles.registerLink}>Daftar</Text>
-                </TouchableOpacity>
-            </View>
+        <View style={styles.container}>
+            {/* Background Decorative Elements */}
+            <View style={[styles.blob, styles.blob1]} />
+            <View style={[styles.blob, styles.blob2]} />
+            <View style={[styles.blob, styles.blob3]} />
 
-            <View style={styles.content}>
-                <Text style={styles.welcomeText}>Selamat Datang di Marketplace</Text>
-                <Text style={styles.subText}>Masukkan email atau nomor ponselmu untuk masuk</Text>
+            <SafeAreaView style={styles.safeArea}>
+                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        style={styles.keyboardView}
+                    >
+                        {/* Top Illustration */}
+                        <View style={styles.illustrationContainer}>
+                            <Image
+                                source={require('../../assets/images/login.png')}
+                                style={styles.illustration}
+                                resizeMode="contain"
+                            />
+                        </View>
 
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Email atau Nomor Ponsel</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Contoh: anton@email.com"
-                        value={email}
-                        onChangeText={setEmail}
-                        autoCapitalize="none"
-                    />
-                </View>
+                        {/* Heading */}
+                        <Text style={styles.heading}>Mari Belanja</Text>
 
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Password</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Masukkan password"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                    />
-                </View>
+                        {/* Glassmorphic Card */}
+                        <View style={styles.glassCard}>
+                            <View style={styles.inputContainer}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Phone"
+                                    placeholderTextColor="rgba(255, 255, 255, 0.7)"
+                                    value={phone}
+                                    onChangeText={setPhone}
+                                    keyboardType="phone-pad"
+                                />
+                            </View>
 
-                <TouchableOpacity style={styles.forgotPass}>
-                    <Text style={styles.forgotPassText}>Lupa password?</Text>
-                </TouchableOpacity>
+                            <View style={styles.inputContainer}>
+                                <TextInput
+                                    style={[styles.input, { paddingRight: normalize(40) }]}
+                                    placeholder="Password"
+                                    placeholderTextColor="rgba(255, 255, 255, 0.7)"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry={!showPassword}
+                                />
+                                <TouchableOpacity
+                                    style={styles.eyeIcon}
+                                    onPress={() => setShowPassword(!showPassword)}
+                                >
+                                    <Icon
+                                        name={showPassword ? 'eye' : 'eye-off'}
+                                        size={normalize(20)}
+                                        color="rgba(255, 255, 255, 0.8)"
+                                    />
+                                </TouchableOpacity>
+                            </View>
 
-                <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-                    <Text style={styles.loginBtnText}>Masuk</Text>
-                </TouchableOpacity>
+                            <TouchableOpacity style={styles.forgotBtn}>
+                                <Text style={styles.forgotText}>Lupa Password?</Text>
+                            </TouchableOpacity>
 
-                <View style={styles.dividerRow}>
-                    <View style={styles.line} />
-                    <Text style={styles.dividerText}>atau masuk dengan</Text>
-                    <View style={styles.line} />
-                </View>
+                            <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
+                                <Text style={styles.loginBtnText}>Masuk</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                <View style={styles.socialRow}>
-                    <TouchableOpacity style={styles.socialBtn}>
-                        <Icon name="mail" size={normalize(20)} color={COLORS.grey} />
-                        <Text style={styles.socialBtnText}>Google</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.socialBtn}>
-                        <Icon name="facebook" size={normalize(20)} color="#1877F2" />
-                        <Text style={styles.socialBtnText}>Facebook</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </SafeAreaView>
+                        {/* Footer */}
+                        <View style={styles.footer}>
+                            <Text style={styles.footerText}>
+                                Belum punya akun?{' '}
+                                <Text
+                                    style={styles.signUpLink}
+                                    onPress={() => navigation.navigate('Register')}
+                                >
+                                    Daftar
+                                </Text>
+                            </Text>
+                        </View>
+                    </KeyboardAvoidingView>
+                </ScrollView>
+            </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
+        backgroundColor: '#1E56C5', // Deep blue base
     },
-    header: {
-        flexDirection: 'row',
+    safeArea: {
+        flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
+    },
+    keyboardView: {
+        flex: 1,
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: SPACING.md,
-        height: normalize(56),
+        paddingHorizontal: SPACING.xl,
     },
-    headerTitle: {
-        fontSize: normalize(18),
+    blob: {
+        position: 'absolute',
+        width: width * 0.6,
+        height: width * 0.6,
+        borderRadius: width * 0.3,
+        opacity: 0.6,
+    },
+    blob1: {
+        backgroundColor: '#FF6B6B',
+        top: height * 0.65,
+        left: -width * 0.2,
+    },
+    blob2: {
+        backgroundColor: '#B533FF',
+        top: height * 0.55,
+        right: -width * 0.1,
+    },
+    blob3: {
+        backgroundColor: '#FFA500',
+        top: height * 0.45,
+        left: width * 0.1,
+        width: width * 0.3,
+        height: width * 0.3,
+    },
+    illustrationContainer: {
+        width: '100%',
+        height: height * 0.4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: SPACING.lg,
+    },
+    illustration: {
+        width: '100%',
+        height: '100%',
+    },
+    heading: {
+        fontSize: normalize(36),
         fontWeight: 'bold',
-        color: COLORS.black,
+        color: COLORS.white,
+        marginBottom: SPACING.lg,
+        textAlign: 'center',
     },
-    registerLink: {
-        fontSize: normalize(14),
-        fontWeight: 'bold',
-        color: COLORS.primary,
+    glassCard: {
+        width: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        borderRadius: SIZES.radiusLg,
+        padding: SPACING.xl,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
+        // Shadow for premium feel
+        // shadowColor: '#000',
+        // shadowOffset: { width: 0, height: 10 },
+        // shadowOpacity: 0.1,
+        // shadowRadius: 20,
+        // elevation: 5,
     },
-    content: {
-        padding: SPACING.lg,
-    },
-    welcomeText: {
-        fontSize: normalize(20),
-        fontWeight: 'bold',
-        color: COLORS.black,
-        marginBottom: 8,
-    },
-    subText: {
-        fontSize: normalize(14),
-        color: COLORS.grey,
-        marginBottom: SPACING.xl,
-    },
-    inputGroup: {
+    inputContainer: {
+        width: '100%',
+        height: normalize(52),
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.8)',
+        borderRadius: normalize(15),
         marginBottom: SPACING.md,
-    },
-    label: {
-        fontSize: normalize(12),
-        fontWeight: 'bold',
-        color: COLORS.grey,
-        marginBottom: 4,
+        justifyContent: 'center',
+        paddingHorizontal: SPACING.md,
     },
     input: {
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
-        height: normalize(40),
         fontSize: normalize(16),
-        color: COLORS.black,
+        color: COLORS.white,
     },
-    forgotPass: {
+    eyeIcon: {
+        position: 'absolute',
+        right: SPACING.md,
+    },
+    forgotBtn: {
         alignSelf: 'flex-end',
         marginBottom: SPACING.xl,
     },
-    forgotPassText: {
-        color: COLORS.primary,
-        fontSize: normalize(13),
+    forgotText: {
+        color: 'rgba(255, 255, 255, 0.8)',
+        fontSize: normalize(12),
     },
     loginBtn: {
-        backgroundColor: COLORS.primary,
+        width: '60%',
+        alignSelf: 'center',
         height: normalize(48),
-        borderRadius: SIZES.radius,
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        borderRadius: normalize(12),
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.4)',
     },
     loginBtnText: {
         color: COLORS.white,
+        fontSize: normalize(18),
         fontWeight: 'bold',
-        fontSize: normalize(16),
     },
-    dividerRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginVertical: SPACING.xl,
+    footer: {
+        marginTop: SPACING.xxl,
+        marginBottom: SPACING.lg,
     },
-    line: {
-        flex: 1,
-        height: 1,
-        backgroundColor: COLORS.border,
-    },
-    dividerText: {
-        paddingHorizontal: SPACING.md,
-        color: COLORS.grey,
-        fontSize: normalize(12),
-    },
-    socialRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    socialBtn: {
-        flex: 0.48,
-        height: normalize(44),
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        borderRadius: SIZES.radius,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    socialBtnText: {
-        marginLeft: 8,
+    footerText: {
+        color: COLORS.white,
         fontSize: normalize(14),
-        color: COLORS.black,
+    },
+    signUpLink: {
         fontWeight: 'bold',
+        color: '#ffcc33', // User requested yellow/orange 'Daftar'
     },
 });
 

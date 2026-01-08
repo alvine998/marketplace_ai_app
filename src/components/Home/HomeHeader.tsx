@@ -13,10 +13,12 @@ import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import SearchOverlay from './SearchOverlay';
+import { useCart } from '../../context/CartContext';
 
 const HomeHeader = () => {
     const navigation = useNavigation<DrawerNavigationProp<any>>();
     const [searchVisible, setSearchVisible] = React.useState(false);
+    const { itemCount } = useCart();
 
     // Mock unread counts
     const unreadMessages = 2;
@@ -51,7 +53,7 @@ const HomeHeader = () => {
                         onPress={() => (navigation as any).navigate('Inbox')}
                     >
                         <View>
-                            <Icon name="mail" size={normalize(22)} color={COLORS.black} />
+                            <Icon name="mail" size={normalize(22)} color={COLORS.white} />
                             {renderBadge(unreadMessages)}
                         </View>
                     </TouchableOpacity>
@@ -60,7 +62,7 @@ const HomeHeader = () => {
                         onPress={() => (navigation as any).navigate('Notifications')}
                     >
                         <View>
-                            <Icon name="bell" size={normalize(22)} color={COLORS.black} />
+                            <Icon name="bell" size={normalize(22)} color={COLORS.white} />
                             {renderBadge(unreadNotifications)}
                         </View>
                     </TouchableOpacity>
@@ -68,13 +70,16 @@ const HomeHeader = () => {
                         style={styles.iconButton}
                         onPress={() => (navigation as any).navigate('Cart')}
                     >
-                        <Icon name="shopping-cart" size={normalize(22)} color={COLORS.black} />
+                        <View>
+                            <Icon name="shopping-cart" size={normalize(22)} color={COLORS.white} />
+                            {renderBadge(itemCount)}
+                        </View>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.iconButton}
                         onPress={() => navigation.openDrawer()}
                     >
-                        <Icon name="menu" size={normalize(22)} color={COLORS.black} />
+                        <Icon name="menu" size={normalize(22)} color={COLORS.white} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -96,7 +101,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: SPACING.md,
         paddingVertical: SPACING.sm,
-        backgroundColor: COLORS.white,
+        backgroundColor: COLORS.primary,
+        // marginBottom: normalize(100)
     },
     searchSection: {
         flex: 1,

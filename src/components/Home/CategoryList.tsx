@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
@@ -7,26 +7,28 @@ import { useNavigation } from '@react-navigation/native';
 import { useResponsive } from '../../utils/responsive';
 
 const CATEGORIES = [
+    { id: 2, name: 'Lihat Semua', icon: 'grid' },
     { id: 1, name: 'Promo Hari Ini', icon: 'zap' },
     { id: 4, name: 'Elektronik', icon: 'tv' },
     { id: 5, name: 'Fashion Pria', icon: 'user' },
     { id: 6, name: 'Fashion Wanita', icon: 'heart' },
     { id: 7, name: 'Rumah Tangga', icon: 'home' },
     { id: 8, name: 'Kecantikan', icon: 'smile' },
-    { id: 2, name: 'Lihat Semua', icon: 'grid' },
 ];
 
 const CategoryList = () => {
     const navigation = useNavigation<any>();
     const { width, columns } = useResponsive();
 
-    // On wider screens, show more categories per row
-    const itemsPerRow = width > 700 ? 6 : width > 500 ? 5 : 4;
-    const itemWidth = (width - (SPACING.md * 2)) / itemsPerRow;
+    const itemWidth = normalize(80);
 
     return (
         <View style={styles.container}>
-            <View style={styles.grid}>
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+            >
                 {CATEGORIES.map((category) => (
                     <TouchableOpacity
                         key={category.id}
@@ -49,7 +51,7 @@ const CategoryList = () => {
                         </Text>
                     </TouchableOpacity>
                 ))}
-            </View>
+            </ScrollView>
         </View>
     );
 };
@@ -59,14 +61,12 @@ const styles = StyleSheet.create({
         marginVertical: SPACING.md,
         paddingHorizontal: SPACING.md,
     },
-    grid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        width: '100%',
+    scrollContent: {
+        paddingHorizontal: SPACING.xs,
     },
     categoryItem: {
         alignItems: 'center',
-        marginBottom: SPACING.md,
+        marginRight: SPACING.xs,
     },
     iconWrapper: {
         width: normalize(45),

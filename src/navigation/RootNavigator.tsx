@@ -37,6 +37,8 @@ import HelpDetailScreen from '../screens/Help/HelpDetailScreen';
 import SplashScreen from '../screens/SplashScreen';
 import TermsScreen from '../screens/Legal/TermsScreen';
 import PrivacyPolicyScreen from '../screens/Legal/PrivacyPolicyScreen';
+import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
+import ProfileScreen from '../screens/Profile/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -173,12 +175,12 @@ const MainTabs = () => {
 
                     if (route.name === 'Home') {
                         iconName = 'home';
-                    } else if (route.name === 'Feed') {
-                        iconName = 'rss';
+                    } else if (route.name === 'Chat') {
+                        iconName = 'message-circle';
                     } else if (route.name === 'Official Store') {
                         iconName = 'shopping-bag';
-                    } else if (route.name === 'Wishlist') {
-                        iconName = 'heart';
+                    } else if (route.name === 'Profile') {
+                        iconName = 'user';
                     } else if (route.name === 'Transactions') {
                         iconName = 'list';
                     }
@@ -191,10 +193,11 @@ const MainTabs = () => {
             })}
         >
             <Tab.Screen name="Home" component={HomeStack} />
-            <Tab.Screen name="Feed" component={FeedScreen} />
-            <Tab.Screen name="Official Store" component={OfficialStoreScreen} />
-            <Tab.Screen name="Wishlist" component={WishlistScreen} />
+            <Tab.Screen name="Chat" component={InboxScreen} />
+            {/* <Tab.Screen name="Official Store" component={OfficialStoreScreen} /> */}
+            {/* <Tab.Screen name="Wishlist" component={WishlistScreen} /> */}
             <Tab.Screen name="Transactions" component={TransactionScreen} />
+            <Tab.Screen name="Profile" component={ProfileScreen} />
         </Tab.Navigator>
     );
 };
@@ -229,6 +232,9 @@ const RootNavigator = () => {
                 screenOptions={{ headerShown: false }}
             >
                 <Stack.Screen name="Splash" component={SplashScreen} />
+                <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+                <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen name="Register" component={RegisterScreen} />
                 <Stack.Screen name="Main" component={MainDrawer} />
             </Stack.Navigator>
         </NavigationContainer>
