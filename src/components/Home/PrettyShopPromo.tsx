@@ -118,8 +118,8 @@ const PrettyShopPromo = () => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#1E56C5',
-        paddingVertical: SPACING.md,
-        marginVertical: SPACING.sm,
+        paddingVertical: SPACING.sm,
+        marginBottom: SPACING.sm,
     },
     headerRow: {
         flexDirection: 'row',

@@ -295,11 +295,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     listContainer: {
-        padding: SPACING.sm,
+        padding: 4, // Reduced from SPACING.sm (8)
     },
     listHeader: {
-        padding: SPACING.sm,
-        marginBottom: SPACING.xs,
+        paddingHorizontal: SPACING.sm,
+        paddingTop: SPACING.sm,
+        marginBottom: 2,
     },
     categoryTitle: {
         fontSize: normalize(18),
@@ -312,7 +313,7 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     productWrapper: {
-        padding: 4,
+        padding: 2, // Reduced from 4 for tighter gap
     },
 });
 

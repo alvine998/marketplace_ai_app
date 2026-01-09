@@ -18,20 +18,20 @@ const { width, height } = Dimensions.get('window');
 const ONBOARDING_DATA = [
     {
         id: '1',
-        title: 'Selamat Datang\nDi Pretty Shop',
-        description: 'Beragam produk kebutuhan\nhingga promo menarik untuk\nanda',
+        title: 'Selamat Datang Di Pretty Shop',
+        description: 'Beragam produk kebutuhan hingga promo menarik untuk anda',
         image: require('../../assets/images/onboarding1.png'),
     },
     {
         id: '2',
         title: 'Banyak Diskon %',
-        description: 'Pretty Shop mempermudah\npembelian produk kebutuhan\nanda',
+        description: 'Pretty Shop mempermudah pembelian produk kebutuhan anda',
         image: require('../../assets/images/onboarding2.png'),
     },
     {
         id: '3',
         title: 'Mitra Pretty Shop',
-        description: 'Jadilah mitra Pretty Shop untuk\nMeningkatkan penjualan anda',
+        description: 'Jadilah mitra Pretty Shop untuk Meningkatkan penjualan anda',
         image: require('../../assets/images/onboarding3.png'),
     },
 ];
@@ -174,13 +174,11 @@ const styles = StyleSheet.create({
         fontSize: normalize(28),
         fontWeight: 'bold',
         color: COLORS.black,
-        lineHeight: normalize(34),
         marginBottom: SPACING.md,
     },
     description: {
         fontSize: normalize(16),
         color: COLORS.grey,
-        lineHeight: normalize(22),
     },
     footer: {
         position: 'absolute',

@@ -7,29 +7,24 @@ import {
     SafeAreaView,
     ScrollView,
     Dimensions,
+    Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import { COLORS, SPACING, SIZES } from '../../utils/theme';
+import { COLORS, SPACING, SIZES, SHADOWS } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 
 const { width } = Dimensions.get('window');
 
 const ALL_CATEGORIES = [
-    { id: 4, name: 'Elektronik', icon: 'tv' },
-    { id: 5, name: 'Fashion Pria', icon: 'user' },
-    { id: 6, name: 'Fashion Wanita', icon: 'heart' },
-    { id: 7, name: 'Rumah Tangga', icon: 'home' },
-    { id: 8, name: 'Kecantikan', icon: 'smile' },
-    { id: 9, name: 'Kesehatan', icon: 'target' },
-    { id: 10, name: 'Olahraga', icon: 'wind' },
-    { id: 11, name: 'Otomotif', icon: 'truck' },
-    { id: 12, name: 'Mainan & Hobi', icon: 'award' },
-    { id: 13, name: 'Buku', icon: 'book' },
-    { id: 14, name: 'Makanan & Minuman', icon: 'coffee' },
-    { id: 15, name: 'Ibu & Bayi', icon: 'github' }, // Substitute icon
-    { id: 16, name: 'Handphone & Tablet', icon: 'smartphone' },
-    { id: 17, name: 'Komputer & Laptop', icon: 'monitor' },
-    { id: 18, name: 'Kamera', icon: 'camera' },
+    { id: 1, name: 'UMKM', icon: require('../../assets/icons/umkm.png') },
+    { id: 2, name: 'Fashion', icon: require('../../assets/icons/fashion.png') },
+    { id: 3, name: 'Kesehatan', icon: require('../../assets/icons/kesehatan.png') },
+    { id: 4, name: 'Otomotif', icon: require('../../assets/icons/otomotif.png') },
+    { id: 5, name: 'Kecantikan', icon: require('../../assets/icons/kecantikan.png') },
+    { id: 6, name: 'Properti', icon: require('../../assets/icons/properti.png') },
+    { id: 7, name: 'Kebutuhan Rumah', icon: require('../../assets/icons/kebutuhan_rumah.png') },
+    { id: 8, name: 'Peluang Usaha', icon: require('../../assets/icons/peluang_usaha.png') },
+    { id: 9, name: 'Lain-lain', icon: require('../../assets/icons/lain_lain.png') },
 ];
 
 const AllCategoriesScreen = ({ navigation }: any) => {
@@ -51,7 +46,7 @@ const AllCategoriesScreen = ({ navigation }: any) => {
                             onPress={() => navigation.navigate('CategoryProductList', { category })}
                         >
                             <View style={styles.iconBox}>
-                                <Icon name={category.icon} size={normalize(28)} color={COLORS.primary} />
+                                <Image source={category.icon} style={styles.categoryIcon} resizeMode="contain" />
                             </View>
                             <Text style={styles.categoryName}>{category.name}</Text>
                         </TouchableOpacity>
@@ -84,7 +79,7 @@ const styles = StyleSheet.create({
         color: COLORS.black,
     },
     scrollContent: {
-        padding: SPACING.md,
+        padding: SPACING.sm, // Reduced from SPACING.md
     },
     grid: {
         flexDirection: 'row',
@@ -92,28 +87,28 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     categoryCard: {
-        width: (width - (SPACING.md * 3)) / 2,
+        width: (width - (SPACING.sm * 3)) / 2, // Use SPACING.sm for tighter gap
         backgroundColor: '#F8F9FA',
         borderRadius: SIZES.radius,
-        padding: SPACING.md,
+        padding: SPACING.sm, // Reduced from SPACING.md
         alignItems: 'center',
-        marginBottom: SPACING.md,
+        marginBottom: SPACING.sm,
         borderWidth: 1,
         borderColor: COLORS.border,
     },
     iconBox: {
-        width: normalize(56),
-        height: normalize(56),
-        borderRadius: normalize(28),
+        width: normalize(64),
+        height: normalize(64),
+        borderRadius: normalize(32),
         backgroundColor: COLORS.white,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: SPACING.sm,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        ...SHADOWS.soft,
+    },
+    categoryIcon: {
+        width: normalize(44),
+        height: normalize(44),
     },
     categoryName: {
         fontSize: normalize(13),

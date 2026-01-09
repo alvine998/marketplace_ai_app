@@ -75,12 +75,12 @@ const HomeHeader = () => {
                             {renderBadge(itemCount)}
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={styles.iconButton}
                         onPress={() => navigation.openDrawer()}
                     >
                         <Icon name="menu" size={normalize(22)} color={COLORS.white} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>
 

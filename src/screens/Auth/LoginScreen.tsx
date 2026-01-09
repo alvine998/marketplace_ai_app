@@ -12,8 +12,8 @@ import {
     Platform,
     ScrollView,
 } from 'react-native';
-import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/Feather';
+import Toast from 'react-native-toast-message';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useAuth } from '../../context/AuthContext';
@@ -54,80 +54,89 @@ const LoginScreen = ({ navigation }: any) => {
             <View style={[styles.blob, styles.blob3]} />
 
             <SafeAreaView style={styles.safeArea}>
-                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                        style={styles.keyboardView}
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{ flex: 1 }}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+                >
+                    <ScrollView
+                        contentContainerStyle={styles.scrollContent}
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
                     >
-                        {/* Top Illustration */}
-                        <View style={styles.illustrationContainer}>
-                            <Image
-                                source={require('../../assets/images/login.png')}
-                                style={styles.illustration}
-                                resizeMode="contain"
-                            />
-                        </View>
-
-                        {/* Heading */}
-                        <Text style={styles.heading}>Mari Belanja</Text>
-
-                        {/* Glassmorphic Card */}
-                        <View style={styles.glassCard}>
-                            <View style={styles.inputContainer}>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Phone"
-                                    placeholderTextColor="rgba(255, 255, 255, 0.7)"
-                                    value={phone}
-                                    onChangeText={setPhone}
-                                    keyboardType="phone-pad"
+                        <View style={styles.innerContainer}>
+                            {/* Top Illustration */}
+                            <View style={styles.illustrationContainer}>
+                                <Image
+                                    source={require('../../assets/images/login.png')}
+                                    style={styles.illustration}
+                                    resizeMode="contain"
                                 />
                             </View>
 
-                            <View style={styles.inputContainer}>
-                                <TextInput
-                                    style={[styles.input, { paddingRight: normalize(40) }]}
-                                    placeholder="Password"
-                                    placeholderTextColor="rgba(255, 255, 255, 0.7)"
-                                    value={password}
-                                    onChangeText={setPassword}
-                                    secureTextEntry={!showPassword}
-                                />
-                                <TouchableOpacity
-                                    style={styles.eyeIcon}
-                                    onPress={() => setShowPassword(!showPassword)}
-                                >
-                                    <Icon
-                                        name={showPassword ? 'eye' : 'eye-off'}
-                                        size={normalize(20)}
-                                        color="rgba(255, 255, 255, 0.8)"
-                                    />
-                                </TouchableOpacity>
+                            {/* Heading */}
+                            <Text style={styles.heading}>Mari Belanja</Text>
+
+                            {/* Glassmorphic Card */}
+                            <View style={styles.glassCard}>
+                                <View style={styles.cardContent}>
+                                    <View style={styles.inputContainer}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Phone"
+                                            placeholderTextColor="rgba(255, 255, 255, 0.7)"
+                                            value={phone}
+                                            onChangeText={setPhone}
+                                            keyboardType="phone-pad"
+                                        />
+                                    </View>
+
+                                    <View style={styles.inputContainer}>
+                                        <TextInput
+                                            style={[styles.input, { paddingRight: normalize(40) }]}
+                                            placeholder="Password"
+                                            placeholderTextColor="rgba(255, 255, 255, 0.7)"
+                                            value={password}
+                                            onChangeText={setPassword}
+                                            secureTextEntry={!showPassword}
+                                        />
+                                        <TouchableOpacity
+                                            style={styles.eyeIcon}
+                                            onPress={() => setShowPassword(!showPassword)}
+                                        >
+                                            <Icon
+                                                name={showPassword ? 'eye' : 'eye-off'}
+                                                size={normalize(20)}
+                                                color="rgba(255, 255, 255, 0.8)"
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    <TouchableOpacity style={styles.forgotBtn}>
+                                        <Text style={styles.forgotText}>Lupa Password?</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
+                                        <Text style={styles.loginBtnText}>Masuk</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
 
-                            <TouchableOpacity style={styles.forgotBtn}>
-                                <Text style={styles.forgotText}>Lupa Password?</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-                                <Text style={styles.loginBtnText}>Masuk</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* Footer */}
-                        <View style={styles.footer}>
-                            <Text style={styles.footerText}>
-                                Belum punya akun?{' '}
-                                <Text
-                                    style={styles.signUpLink}
-                                    onPress={() => navigation.navigate('Register')}
-                                >
-                                    Daftar
+                            {/* Footer */}
+                            <View style={styles.footer}>
+                                <Text style={styles.footerText}>
+                                    Belum punya akun?{' '}
+                                    <Text
+                                        style={styles.signUpLink}
+                                        onPress={() => navigation.navigate('Register')}
+                                    >
+                                        Daftar
+                                    </Text>
                                 </Text>
-                            </Text>
+                            </View>
                         </View>
-                    </KeyboardAvoidingView>
-                </ScrollView>
+                    </ScrollView>
+                </KeyboardAvoidingView>
             </SafeAreaView>
         </View>
     );
@@ -136,57 +145,58 @@ const LoginScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1E56C5', // Deep blue base
+        backgroundColor: '#154AB4', // Deeper, more vibrant blue
     },
     safeArea: {
         flex: 1,
     },
     scrollContent: {
         flexGrow: 1,
-        justifyContent: 'center',
     },
-    keyboardView: {
+    innerContainer: {
         flex: 1,
         alignItems: 'center',
         paddingHorizontal: SPACING.xl,
+        paddingBottom: SPACING.xl,
     },
     blob: {
         position: 'absolute',
-        width: width * 0.6,
-        height: width * 0.6,
-        borderRadius: width * 0.3,
-        opacity: 0.6,
+        width: width * 0.8,
+        height: width * 0.8,
+        borderRadius: width * 0.4,
+        opacity: 0.4,
     },
     blob1: {
-        backgroundColor: '#FF6B6B',
-        top: height * 0.65,
-        left: -width * 0.2,
+        backgroundColor: '#B533FF',
+        top: height * 0.7,
+        left: -width * 0.3,
     },
     blob2: {
-        backgroundColor: '#B533FF',
-        top: height * 0.55,
-        right: -width * 0.1,
+        backgroundColor: '#00D1FF',
+        top: height * 0.4,
+        right: -width * 0.3,
     },
     blob3: {
-        backgroundColor: '#FFA500',
-        top: height * 0.45,
-        left: width * 0.1,
-        width: width * 0.3,
-        height: width * 0.3,
+        backgroundColor: '#FF6B6B',
+        top: height * 0.1,
+        left: -width * 0.1,
+        width: width * 0.5,
+        height: width * 0.5,
+        borderRadius: width * 0.25,
     },
     illustrationContainer: {
         width: '100%',
-        height: height * 0.4,
+        height: height * 0.3, // Reduced from 0.4 to give more space
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: SPACING.lg,
+        marginTop: SPACING.xl,
     },
     illustration: {
         width: '100%',
         height: '100%',
     },
     heading: {
-        fontSize: normalize(36),
+        fontSize: normalize(32), // Slightly reduced from 36
         fontWeight: 'bold',
         color: COLORS.white,
         marginBottom: SPACING.lg,
@@ -196,16 +206,19 @@ const styles = StyleSheet.create({
         width: '100%',
         backgroundColor: 'rgba(255, 255, 255, 0.15)',
         borderRadius: SIZES.radiusLg,
-        padding: SPACING.xl,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.3)',
-        // Shadow for premium feel
-        // shadowColor: '#000',
-        // shadowOffset: { width: 0, height: 10 },
-        // shadowOpacity: 0.1,
-        // shadowRadius: 20,
-        // elevation: 5,
+        overflow: 'hidden',
     },
+    cardContent: {
+        padding: SPACING.xl,
+    },
+    // Shadow for premium feel
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 10 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 20,
+    // elevation: 5,
     inputContainer: {
         width: '100%',
         height: normalize(52),

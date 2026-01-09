@@ -20,45 +20,86 @@ import { useResponsive } from '../../utils/responsive';
 import { Dimensions } from 'react-native';
 import { useTranslation } from '../../context/LanguageContext';
 import PromotionModal from '../../components/Home/PromotionModal';
-import PrettyShopPromo from '../../components/Home/PrettyShopPromo';
+import FlashSale from '../../components/Home/FlashSale';
+import AdCard from '../../components/Home/AdCard';
 
 const PRODUCT_DATA = [
     {
-        id: '1',
-        title: 'Apple iPhone 15 Pro 128GB Blue Titanium',
-        price: 'Rp 18.490.000',
-        location: 'Jakarta Barat',
-        rating: '4.9',
-        sold: '1rb+',
-        imageUrl: 'https://picsum.photos/seed/p1/400/400',
+        type: 'mixed_row',
+        id: 'row1',
+        left: { type: 'flash_sale', id: 'fs1' },
+        right: {
+            type: 'product',
+            id: 'p1',
+            title: 'Premium White T-Shirt Cotton Combed 30s',
+            price: 'Rp 25.000',
+            location: 'Bekasi Barat',
+            rating: '5.0',
+            sold: '500',
+            imageUrl: 'https://picsum.photos/seed/tshirt/400/400',
+            discountPercentage: '30%',
+            hasExtraVoucher: true,
+            isFreeShipping: true,
+            isDiscountedPrice: true,
+        },
     },
     {
-        id: '2',
-        title: 'Samsung Galaxy S24 Ultra 12/256GB Gray',
-        price: 'Rp 19.999.000',
-        location: 'Jakarta Selatan',
-        rating: '5.0',
-        sold: '500+',
-        imageUrl: 'https://picsum.photos/seed/p2/400/400',
+        type: 'mixed_row',
+        id: 'row2',
+        left: {
+            type: 'product',
+            id: 'p2',
+            title: 'Nike Air Max 270 Black Anthracite',
+            price: 'Rp 2.199.000',
+            location: 'Jakarta Utara',
+            rating: '4.9',
+            sold: '250',
+            imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',
+            discountPercentage: '10%',
+            hasExtraVoucher: true,
+            isFreeShipping: true,
+            isDiscountedPrice: true,
+        },
+        right: {
+            type: 'ad',
+            id: 'ad1',
+            imageUrl: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80',
+            overlayText: 'ORDER SEKARANG',
+            subText: 'MAKAN SEHAT'
+        }
     },
     {
-        id: '3',
-        title: 'Sony WH-1000XM5 Wireless Noise Cancelling',
-        price: 'Rp 4.499.000',
-        location: 'Tangerang',
-        rating: '4.8',
-        sold: '2rb+',
-        imageUrl: 'https://picsum.photos/seed/p3/400/400',
-    },
-    {
-        id: '4',
-        title: 'Instant Coffee Platinum Blend 500g',
-        price: 'Rp 85.000',
-        location: 'Bandung',
-        rating: '4.7',
-        sold: '10rb+',
-        imageUrl: 'https://picsum.photos/seed/p4/400/400',
-    },
+        type: 'product_row',
+        id: 'row3',
+        products: [
+            {
+                id: 'p3',
+                title: 'Batik Pria Modern Slimfit Eksklusif',
+                price: 'Rp 125.000',
+                location: 'Solo',
+                rating: '4.8',
+                sold: '1.2rb',
+                imageUrl: 'https://picsum.photos/seed/batik/400/400',
+                discountPercentage: '15%',
+                hasExtraVoucher: false,
+                isFreeShipping: true,
+                isDiscountedPrice: false,
+            },
+            {
+                id: 'p4',
+                title: 'Smartwatch Ultra 2 Series GPS 49mm',
+                price: 'Rp 13.999.000',
+                location: 'Jakarta Pusat',
+                rating: '5.0',
+                sold: '80',
+                imageUrl: 'https://images.unsplash.com/photo-1544117518-30df5780991d?w=400&q=80',
+                discountPercentage: '5%',
+                hasExtraVoucher: false,
+                isFreeShipping: false,
+                isDiscountedPrice: false,
+            }
+        ]
+    }
 ];
 
 const HomeScreen = ({ navigation }: any) => {
@@ -67,7 +108,6 @@ const HomeScreen = ({ navigation }: any) => {
     const [promoVisible, setPromoVisible] = React.useState(false);
 
     React.useEffect(() => {
-        // Show promo modal after 1.5s delay
         const timer = setTimeout(() => {
             setPromoVisible(true);
         }, 1500);
@@ -80,8 +120,6 @@ const HomeScreen = ({ navigation }: any) => {
             setRefreshing(false);
         }, 2000);
     }, []);
-
-    const { columns, width: screenWidth } = useResponsive();
 
     const renderHeader = () => (
         <View>
@@ -101,14 +139,61 @@ const HomeScreen = ({ navigation }: any) => {
                 </TouchableOpacity>
             </View>
             <BannerSlider />
-
             <CategoryList />
-            <PrettyShopPromo />
             <View style={styles.productSection}>
                 <Text style={styles.sectionTitle}>{t('common.recommendation')}</Text>
             </View>
         </View>
     );
+
+    const renderCard = (item: any) => {
+        switch (item.type) {
+            case 'flash_sale':
+                return <FlashSale />;
+            case 'ad':
+                return (
+                    <AdCard
+                        imageUrl={item.imageUrl}
+                        overlayText={item.overlayText}
+                        subText={item.subText}
+                        onPress={() => navigation.navigate('AdDetail', {
+                            imageUrl: item.imageUrl,
+                            title: item.subText || 'Promo Spesial',
+                            description: `Dapatkan penawaran terbaik untuk ${item.subText || 'produk ini'} hanya di platform kami!`
+                        })}
+                    />
+                );
+            case 'product':
+                return <ProductCard {...item} width="100%" />;
+            default:
+                return null;
+        }
+    };
+
+    const renderItem = ({ item }: { item: any }) => {
+        if (item.type === 'mixed_row') {
+            return (
+                <View style={styles.productRow}>
+                    <View style={{ width: '49.3%' }}>
+                        {renderCard(item.left)}
+                    </View>
+                    <View style={{ width: '49.3%' }}>
+                        {renderCard(item.right)}
+                    </View>
+                </View>
+            );
+        }
+        if (item.type === 'product_row') {
+            return (
+                <View style={styles.productRow}>
+                    {item.products.map((p: any) => (
+                        <ProductCard key={p.id} {...p} width="49.3%" />
+                    ))}
+                </View>
+            );
+        }
+        return null;
+    };
 
     return (
         <View style={styles.container}>
@@ -116,16 +201,7 @@ const HomeScreen = ({ navigation }: any) => {
             <FlatList
                 data={PRODUCT_DATA}
                 keyExtractor={(item) => item.id}
-                numColumns={columns}
-                key={columns} // Force re-render if columns change
-                renderItem={({ item }) => (
-                    <View style={[styles.productItem, { width: `${100 / columns}%` as DimensionValue }]}>
-                        <ProductCard
-                            {...item}
-                            width="100%"
-                        />
-                    </View>
-                )}
+                renderItem={renderItem}
                 ListHeaderComponent={renderHeader}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContent}
@@ -148,7 +224,7 @@ const HomeScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F8F9FA',
+        backgroundColor: '#F3F4F6', // Slightly more neutral grey to make white cards pop
     },
     productSection: {
         paddingHorizontal: SPACING.md,
@@ -166,7 +242,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         backgroundColor: COLORS.primary + '10',
         marginHorizontal: SPACING.md,
-        marginTop: SPACING.lg,
+        marginTop: SPACING.sm,
         padding: SPACING.md,
         borderRadius: SIZES.radius,
         borderWidth: 1,
@@ -203,9 +279,18 @@ const styles = StyleSheet.create({
     listContent: {
         paddingBottom: SPACING.xl,
     },
-    productItem: {
-        paddingHorizontal: SPACING.sm,
+    flashSaleWrapper: {
+        paddingHorizontal: SPACING.md,
         marginBottom: SPACING.md,
+    },
+    adWrapper: {
+        paddingHorizontal: SPACING.md,
+        marginBottom: SPACING.md,
+    },
+    productRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: SPACING.sm,
     },
 });
 

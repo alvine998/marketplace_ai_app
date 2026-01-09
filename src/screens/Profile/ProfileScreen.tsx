@@ -84,7 +84,8 @@ const ProfileScreen = ({ navigation }: any) => {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Aktivitas Saya</Text>
                     <View style={styles.menuBox}>
-                        {renderMenuItem('shopping-bag', 'Pesanan Saya', () => navigation.navigate('Transactions'), COLORS.primary)}
+                        {renderMenuItem('user', 'Profil Saya', () => navigation.navigate('EditProfile'), COLORS.primary)}
+                        {renderMenuItem('shopping-bag', 'Pesanan Saya', () => navigation.navigate('Transactions'), '#673AB7')}
                         {renderMenuItem('heart', 'Wishlist', () => navigation.navigate('Wishlist'), '#FF4D88')}
                         {renderMenuItem('map-pin', 'Alamat Pengiriman', () => navigation.navigate('AddressList'), '#4CAF50')}
                     </View>

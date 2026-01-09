@@ -39,6 +39,9 @@ import TermsScreen from '../screens/Legal/TermsScreen';
 import PrivacyPolicyScreen from '../screens/Legal/PrivacyPolicyScreen';
 import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
+import EditProfileScreen from '../screens/Profile/EditProfileScreen';
+import FlashSaleScreen from '../screens/Home/FlashSaleScreen';
+import AdScreen from '../screens/Home/AdScreen';
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -65,6 +68,9 @@ const HomeStack = () => {
             <Stack.Screen name="Terms" component={TermsScreen} />
             <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
             <Stack.Screen name="HelpDetail" component={HelpDetailScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="FlashSale" component={FlashSaleScreen} />
+            <Stack.Screen name="AdDetail" component={AdScreen} />
         </Stack.Navigator>
     );
 };
@@ -236,6 +242,12 @@ const RootNavigator = () => {
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="Register" component={RegisterScreen} />
                 <Stack.Screen name="Main" component={MainDrawer} />
+                <Stack.Screen name="Profile" component={ProfileScreen} />
+                <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+                <Stack.Screen name="Wishlist" component={WishlistScreen} />
+                <Stack.Screen name="AddressList" component={AddressListScreen} />
+                {/* Flash Sale */}
+                <Stack.Screen name="FlashSale" component={FlashSaleScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

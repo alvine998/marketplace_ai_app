@@ -1,20 +1,20 @@
 import React from 'react';
 import { View, Image, StyleSheet, ScrollView } from 'react-native';
-import { SPACING, SIZES } from '../../utils/theme';
+import { SPACING, SIZES, COLORS, SHADOWS } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useResponsive } from '../../utils/responsive';
 
-const BANNER_HEIGHT = normalize(140);
+const BANNER_HEIGHT = normalize(170);
 
 const BANNER_DATA = [
-    'https://picsum.photos/seed/10/800/400',
-    'https://picsum.photos/seed/11/800/400',
-    'https://picsum.photos/seed/12/800/400',
+    require('../../assets/images/banner2.png'),
+    require('../../assets/images/banner2.png'),
 ];
 
 const BannerSlider = () => {
     const { width } = useResponsive();
-    const bannerWidth = width - (SPACING.md * 2);
+    // Correctly calculate width based on paddingHorizontal: SPACING.sm (8)
+    const bannerWidth = width - (SPACING.sm * 2);
 
     return (
         <View style={styles.container}>
@@ -24,10 +24,10 @@ const BannerSlider = () => {
                 showsHorizontalScrollIndicator={false}
                 style={styles.scrollView}
             >
-                {BANNER_DATA.map((uri, index) => (
+                {BANNER_DATA.map((imageSource, index) => (
                     <View key={index} style={[styles.bannerWrapper, { width: bannerWidth }]}>
                         <Image
-                            source={{ uri }}
+                            source={imageSource}
                             style={styles.bannerImage}
                             resizeMode="cover"
                         />
@@ -41,15 +41,15 @@ const BannerSlider = () => {
 const styles = StyleSheet.create({
     container: {
         height: BANNER_HEIGHT,
-        marginTop: SPACING.md,
-        paddingHorizontal: SPACING.md,
+        marginTop: SPACING.sm,
+        paddingHorizontal: SPACING.sm,
     },
     scrollView: {
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.radiusLg,
     },
     bannerWrapper: {
         height: BANNER_HEIGHT,
-        borderRadius: SIZES.radius,
+        borderRadius: SIZES.radiusLg,
         overflow: 'hidden',
     },
     bannerImage: {
