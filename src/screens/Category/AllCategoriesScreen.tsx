@@ -16,15 +16,22 @@ import normalize from 'react-native-normalize';
 const { width } = Dimensions.get('window');
 
 const ALL_CATEGORIES = [
-    { id: 1, name: 'UMKM', icon: require('../../assets/icons/umkm.png') },
-    { id: 2, name: 'Fashion', icon: require('../../assets/icons/fashion.png') },
-    { id: 3, name: 'Kesehatan', icon: require('../../assets/icons/kesehatan.png') },
-    { id: 4, name: 'Otomotif', icon: require('../../assets/icons/otomotif.png') },
-    { id: 5, name: 'Kecantikan', icon: require('../../assets/icons/kecantikan.png') },
-    { id: 6, name: 'Properti', icon: require('../../assets/icons/properti.png') },
-    { id: 7, name: 'Kebutuhan Rumah', icon: require('../../assets/icons/kebutuhan_rumah.png') },
-    { id: 8, name: 'Peluang Usaha', icon: require('../../assets/icons/peluang_usaha.png') },
-    { id: 9, name: 'Lain-lain', icon: require('../../assets/icons/lain_lain.png') },
+    { id: 1, name: 'Elektronik', icon: require('../../assets/icons/elektronik.png') },
+    { id: 2, name: 'Fashion Pria', icon: require('../../assets/icons/fashion_pria.png') },
+    { id: 3, name: 'Fashion Wanita', icon: require('../../assets/icons/fashion_wanita.png') },
+    { id: 4, name: 'Handphone & Tablet', icon: require('../../assets/icons/handphone_tablet.png') },
+    { id: 5, name: 'Komputer & Laptop', icon: require('../../assets/icons/komputer_laptop.png') },
+    { id: 6, name: 'Kamera', icon: require('../../assets/icons/kamera.png') },
+    { id: 7, name: 'Kesehatan', icon: require('../../assets/icons/kesehatan.png') },
+    { id: 8, name: 'Kecantikan', icon: require('../../assets/icons/kecantikan.png') },
+    { id: 9, name: 'Ibu & Bayi', icon: require('../../assets/icons/ibu_bayi.png') },
+    { id: 10, name: 'Rumah Tangga', icon: require('../../assets/icons/rumah_tangga.png') },
+    { id: 11, name: 'Makanan & Minuman', icon: require('../../assets/icons/makanan_minuman.png') },
+    { id: 12, name: 'Olahraga', icon: require('../../assets/icons/olahraga.png') },
+    { id: 13, name: 'Mainan & Hobi', icon: require('../../assets/icons/mainan_hobi.png') },
+    { id: 14, name: 'Otomotif', icon: require('../../assets/icons/otomotif.png') },
+    { id: 15, name: 'Buku', icon: require('../../assets/icons/buku.png') },
+    { id: 16, name: 'Lain-lain', icon: require('../../assets/icons/lain_lain.png') },
 ];
 
 const AllCategoriesScreen = ({ navigation }: any) => {
@@ -79,7 +86,7 @@ const styles = StyleSheet.create({
         color: COLORS.black,
     },
     scrollContent: {
-        padding: SPACING.sm, // Reduced from SPACING.md
+        padding: SPACING.sm,
     },
     grid: {
         flexDirection: 'row',
@@ -87,31 +94,31 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     categoryCard: {
-        width: (width - (SPACING.sm * 3)) / 2, // Use SPACING.sm for tighter gap
+        width: (width - (SPACING.sm * 5)) / 4, // 4 items per row
         backgroundColor: '#F8F9FA',
         borderRadius: SIZES.radius,
-        padding: SPACING.sm, // Reduced from SPACING.md
+        padding: SPACING.xs,
         alignItems: 'center',
         marginBottom: SPACING.sm,
         borderWidth: 1,
         borderColor: COLORS.border,
     },
     iconBox: {
-        width: normalize(64),
-        height: normalize(64),
-        borderRadius: normalize(32),
+        width: normalize(48),
+        height: normalize(48),
+        borderRadius: normalize(24),
         backgroundColor: COLORS.white,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: SPACING.sm,
+        marginBottom: SPACING.xs,
         ...SHADOWS.soft,
     },
     categoryIcon: {
-        width: normalize(44),
-        height: normalize(44),
+        width: normalize(32),
+        height: normalize(32),
     },
     categoryName: {
-        fontSize: normalize(13),
+        fontSize: normalize(10),
         fontWeight: '600',
         color: COLORS.black,
         textAlign: 'center',

@@ -7,15 +7,15 @@ import { useResponsive } from '../../utils/responsive';
 
 const CATEGORIES = [
     { id: 1, name: 'Lihat Semua', icon: require('../../assets/icons/lihat_semua.png') },
-    { id: 2, name: 'UMKM', icon: require('../../assets/icons/umkm.png') },
-    { id: 3, name: 'Fashion', icon: require('../../assets/icons/fashion.png') },
-    { id: 4, name: 'Kesehatan', icon: require('../../assets/icons/kesehatan.png') },
-    { id: 5, name: 'Otomotif', icon: require('../../assets/icons/otomotif.png') },
-    { id: 6, name: 'Kecantikan', icon: require('../../assets/icons/kecantikan.png') },
-    { id: 7, name: 'Properti', icon: require('../../assets/icons/properti.png') },
-    { id: 8, name: 'Kebutuhan Rumah', icon: require('../../assets/icons/kebutuhan_rumah.png') },
-    { id: 9, name: 'Peluang Usaha', icon: require('../../assets/icons/peluang_usaha.png') },
-    { id: 10, name: 'Lain-lain', icon: require('../../assets/icons/lain_lain.png') },
+    { id: 2, name: 'Elektronik', icon: require('../../assets/icons/elektronik.png') },
+    { id: 3, name: 'Fashion Pria', icon: require('../../assets/icons/fashion_pria.png') },
+    { id: 4, name: 'Fashion Wanita', icon: require('../../assets/icons/fashion_wanita.png') },
+    { id: 5, name: 'Handphone', icon: require('../../assets/icons/handphone_tablet.png') },
+    { id: 6, name: 'Komputer', icon: require('../../assets/icons/komputer_laptop.png') },
+    { id: 7, name: 'Kesehatan', icon: require('../../assets/icons/kesehatan.png') },
+    { id: 8, name: 'Kecantikan', icon: require('../../assets/icons/kecantikan.png') },
+    { id: 9, name: 'Makanan', icon: require('../../assets/icons/makanan_minuman.png') },
+    { id: 10, name: 'Olahraga', icon: require('../../assets/icons/olahraga.png') },
 ];
 
 const CategoryList = () => {

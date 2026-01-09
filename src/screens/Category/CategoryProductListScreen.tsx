@@ -31,6 +31,10 @@ const getMockProducts = (categoryName: string) => [
         rating: '4.9',
         sold: '500+',
         imageUrl: `https://picsum.photos/seed/${categoryName}1/400/400`,
+        discountPercentage: '25%',
+        hasExtraVoucher: true,
+        isFreeShipping: true,
+        isDiscountedPrice: true,
     },
     {
         id: `c2-${categoryName}`,
@@ -40,6 +44,8 @@ const getMockProducts = (categoryName: string) => [
         rating: '4.8',
         sold: '1rb+',
         imageUrl: `https://picsum.photos/seed/${categoryName}2/400/400`,
+        hasExtraVoucher: true,
+        isFreeShipping: true,
     },
     {
         id: `c3-${categoryName}`,
@@ -49,6 +55,8 @@ const getMockProducts = (categoryName: string) => [
         rating: '4.7',
         sold: '2.5rb+',
         imageUrl: `https://picsum.photos/seed/${categoryName}3/400/400`,
+        discountPercentage: '15%',
+        isDiscountedPrice: true,
     },
     {
         id: `c4-${categoryName}`,
@@ -58,6 +66,7 @@ const getMockProducts = (categoryName: string) => [
         rating: '4.9',
         sold: '200+',
         imageUrl: `https://picsum.photos/seed/${categoryName}4/400/400`,
+        isFreeShipping: true,
     },
     {
         id: `c5-${categoryName}`,
@@ -67,6 +76,9 @@ const getMockProducts = (categoryName: string) => [
         rating: '4.6',
         sold: '5rb+',
         imageUrl: `https://picsum.photos/seed/${categoryName}5/400/400`,
+        discountPercentage: '30%',
+        hasExtraVoucher: true,
+        isDiscountedPrice: true,
     },
     {
         id: `c6-${categoryName}`,
@@ -76,6 +88,10 @@ const getMockProducts = (categoryName: string) => [
         rating: '5.0',
         sold: '50+',
         imageUrl: `https://picsum.photos/seed/${categoryName}6/400/400`,
+        discountPercentage: '10%',
+        hasExtraVoucher: true,
+        isFreeShipping: true,
+        isDiscountedPrice: true,
     },
 ];
 
