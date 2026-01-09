@@ -4,11 +4,12 @@ import { SPACING, SIZES, COLORS, SHADOWS } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useResponsive } from '../../utils/responsive';
 
-const BANNER_HEIGHT = normalize(170);
+const BANNER_HEIGHT = normalize(220);
 
 const BANNER_DATA = [
-    require('../../assets/images/banner2.png'),
-    require('../../assets/images/banner2.png'),
+    require('../../assets/images/banner1.jpeg'),
+    require('../../assets/images/banner2.jpeg'),
+    require('../../assets/images/banner3.jpeg'),
 ];
 
 const BannerSlider = () => {
