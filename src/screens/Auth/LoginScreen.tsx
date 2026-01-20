@@ -17,16 +17,24 @@ import Toast from 'react-native-toast-message';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useAuth } from '../../context/AuthContext';
+import { login as loginService } from '../../services/authService';
 
 const { width, height } = Dimensions.get('window');
 
 const LoginScreen = ({ navigation }: any) => {
-    const { login } = useAuth();
+    const { login, isLoggedIn } = useAuth();
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoadingLocal, setIsLoadingLocal] = useState(false);
 
-    const handleLogin = () => {
+    React.useEffect(() => {
+        if (isLoggedIn) {
+            navigation.replace('Main');
+        }
+    }, [isLoggedIn, navigation]);
+
+    const handleLogin = async () => {
         if (!phone || !password) {
             Toast.show({
                 type: 'error',
@@ -36,14 +44,34 @@ const LoginScreen = ({ navigation }: any) => {
             return;
         }
 
-        // Mock Login
-        login({ id: '1', name: 'Alvin', email: 'alvin@example.com' });
-        navigation.navigate('Main');
-        Toast.show({
-            type: 'success',
-            text1: 'Sukses',
-            text2: 'Selamat datang kembali!',
-        });
+        setIsLoadingLocal(true);
+        try {
+            const response = await loginService({ phone, password });
+
+            if (response.token && response.user) {
+                login(response.user, response.token);
+                navigation.replace('Main');
+                Toast.show({
+                    type: 'success',
+                    text1: 'Sukses',
+                    text2: response.message || 'Selamat datang kembali!',
+                });
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Gagal',
+                    text2: response.message || 'Login gagal, periksa kredensial anda',
+                });
+            }
+        } catch (error: any) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error.message || 'Terjadi kesalahan saat masuk',
+            });
+        } finally {
+            setIsLoadingLocal(false);
+        }
     };
 
     return (
@@ -116,8 +144,14 @@ const LoginScreen = ({ navigation }: any) => {
                                         <Text style={styles.forgotText}>Lupa Password?</Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-                                        <Text style={styles.loginBtnText}>Masuk</Text>
+                                    <TouchableOpacity
+                                        style={[styles.loginBtn, isLoadingLocal && { opacity: 0.7 }]}
+                                        onPress={handleLogin}
+                                        disabled={isLoadingLocal}
+                                    >
+                                        <Text style={styles.loginBtnText}>
+                                            {isLoadingLocal ? 'Memuat...' : 'Masuk'}
+                                        </Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>

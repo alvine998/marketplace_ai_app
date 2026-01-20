@@ -15,8 +15,8 @@ import {
 import Toast from 'react-native-toast-message';
 
 const GENDER_OPTIONS = [
-    { label: 'Laki-laki', value: 'Laki-laki' },
-    { label: 'Perempuan', value: 'Perempuan' },
+    { label: 'Laki-laki', value: 'male' },
+    { label: 'Perempuan', value: 'female' },
 ];
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
@@ -141,7 +141,7 @@ const RegisterScreen = ({ navigation }: any) => {
                         >
                             <View style={styles.dropdownContainer}>
                                 <Text style={gender ? styles.dropdownText : styles.dropdownPlaceholder}>
-                                    {gender || 'Jenis Kelamin'}
+                                    {GENDER_OPTIONS.find(o => o.value === gender)?.label || 'Jenis Kelamin'}
                                 </Text>
                                 <Icon name="chevron-down" size={normalize(20)} color="#B3B3B3" />
                             </View>
@@ -240,7 +240,7 @@ const RegisterScreen = ({ navigation }: any) => {
                     </View>
                 </KeyboardAvoidingView>
             </ScrollView>
-        </View>
+        </View >
     );
 };
 

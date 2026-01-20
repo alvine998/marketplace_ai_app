@@ -34,7 +34,12 @@ api.interceptors.response.use(
     // Handle common errors here
     if (error.response) {
       // Server responded with error status
-      console.error('API Error:', error.response.data);
+      console.group('API Error');
+      console.error('Status:', error.response.status);
+      console.error('URL:', error.config?.url);
+      console.error('Request Data:', error.config?.data);
+      console.error('Response Data:', error.response.data);
+      console.groupEnd();
     } else if (error.request) {
       // Request was made but no response received
       console.error('Network Error:', error.message);

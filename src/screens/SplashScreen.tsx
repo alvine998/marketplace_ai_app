@@ -2,17 +2,26 @@ import React, { useEffect } from 'react';
 import { View, Image, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
 import { COLORS } from '../utils/theme';
 import normalize from 'react-native-normalize';
+import { useAuth } from '../context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
 const SplashScreen = ({ navigation }: any) => {
+    const { isLoggedIn, isLoading } = useAuth();
+
     useEffect(() => {
+        if (isLoading) return;
+
         const timer = setTimeout(() => {
-            navigation.replace('Onboarding');
+            if (isLoggedIn) {
+                navigation.replace('Main');
+            } else {
+                navigation.replace('Onboarding');
+            }
         }, 2000);
 
         return () => clearTimeout(timer);
-    }, [navigation]);
+    }, [navigation, isLoggedIn, isLoading]);
 
     return (
         <SafeAreaView style={styles.container}>

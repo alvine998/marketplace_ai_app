@@ -8,6 +8,9 @@ import {
     RefreshControl,
     DimensionValue,
     TouchableOpacity,
+    BackHandler,
+    ToastAndroid,
+    Platform,
 } from 'react-native';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import HomeHeader from '../../components/Home/HomeHeader';
@@ -22,6 +25,7 @@ import { useTranslation } from '../../context/LanguageContext';
 import PromotionModal from '../../components/Home/PromotionModal';
 import FlashSale from '../../components/Home/FlashSale';
 import AdCard from '../../components/Home/AdCard';
+import { useAuth } from '../../context/AuthContext';
 
 const PRODUCT_DATA = [
     {
@@ -104,8 +108,40 @@ const PRODUCT_DATA = [
 
 const HomeScreen = ({ navigation }: any) => {
     const { t } = useTranslation();
+    const { isLoggedIn } = useAuth();
     const [refreshing, setRefreshing] = React.useState(false);
     const [promoVisible, setPromoVisible] = React.useState(false);
+    const [backPressCount, setBackPressCount] = React.useState(0);
+
+    React.useEffect(() => {
+        const backAction = () => {
+            if (isLoggedIn && navigation.isFocused()) {
+                if (backPressCount === 1) {
+                    BackHandler.exitApp();
+                    return true;
+                }
+
+                setBackPressCount(1);
+                if (Platform.OS === 'android') {
+                    ToastAndroid.show('Tekan sekali lagi untuk keluar', ToastAndroid.SHORT);
+                }
+
+                setTimeout(() => {
+                    setBackPressCount(0);
+                }, 2000);
+
+                return true;
+            }
+            return false;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+        );
+
+        return () => backHandler.remove();
+    }, [isLoggedIn, backPressCount, navigation]);
 
     React.useEffect(() => {
         const timer = setTimeout(() => {

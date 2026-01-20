@@ -15,22 +15,65 @@ import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { updateProfile } from '../../services/authService';
+import Toast from 'react-native-toast-message';
 
 const EditProfileScreen = () => {
     const navigation = useNavigation<any>();
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
 
     const [name, setName] = useState(user?.name || '');
-    const [bio, setBio] = useState('');
-    const [gender, setGender] = useState('Laki-laki');
+    const [gender, setGender] = useState(user?.gender === 'female' ? 'Perempuan' : 'Laki-laki');
     const [phone, setPhone] = useState(user?.phone || '');
     const [email, setEmail] = useState(user?.email || '');
 
-    const handleSave = () => {
-        // Mock update
-        Alert.alert('Sukses', 'Profil berhasil diperbarui', [
-            { text: 'OK', onPress: () => navigation.goBack() }
-        ]);
+    const handleSave = async () => {
+        if (!name || !phone || !email) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Mohon lengkapi semua data',
+            });
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const apiGender = gender === 'Perempuan' ? 'female' : 'male';
+            const payload = {
+                name,
+                email,
+                phone,
+                gender: apiGender
+            };
+
+            const response = await updateProfile(user?.id || '', payload);
+
+            if (response && response.success !== false) {
+                await updateUser(payload);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Sukses',
+                    text2: 'Profil berhasil diperbarui',
+                });
+                navigation.goBack();
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Gagal',
+                    text2: response.message || 'Gagal memperbarui profil',
+                });
+            }
+        } catch (error: any) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error.message || 'Terjadi kesalahan sistem',
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const renderInput = (label: string, value: string, onChangeText: (text: string) => void, placeholder?: string, multiline = false) => (
@@ -64,7 +107,6 @@ const EditProfileScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>Informasi Dasar</Text>
                     {renderInput('Nama', name, setName, 'Masukkan nama lengkap')}
-                    {renderInput('Bio', bio, setBio, 'Tulis sedikit tentang dirimu...', true)}
                 </View>
 
                 <View style={styles.section}>
@@ -100,8 +142,14 @@ const EditProfileScreen = () => {
                     {renderInput('Email', email, setEmail, 'Masukkan alamat email', false)}
                 </View>
 
-                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                    <Text style={styles.saveButtonText}>Simpan Perubahan</Text>
+                <TouchableOpacity
+                    style={[styles.saveButton, isLoading && { opacity: 0.7 }]}
+                    onPress={handleSave}
+                    disabled={isLoading}
+                >
+                    <Text style={styles.saveButtonText}>
+                        {isLoading ? 'Memproses...' : 'Simpan Perubahan'}
+                    </Text>
                 </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>

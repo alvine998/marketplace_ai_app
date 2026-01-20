@@ -27,6 +27,7 @@ export interface User {
   phone: string;
   gender?: string;
   address?: string;
+  role?: string;
 }
 
 export interface LoginResponse {
@@ -97,6 +98,13 @@ export const initializeSession = async (): Promise<{
   return { token, user };
 };
 
+export interface UpdateProfilePayload {
+  name: string;
+  email: string;
+  phone: string;
+  gender: string;
+}
+
 /**
  * Register a new user
  * POST /auth/register
@@ -109,6 +117,25 @@ export const register = async (
       '/auth/register',
       payload,
     );
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      return error.response.data;
+    }
+    throw error;
+  }
+};
+
+/**
+ * Update user profile
+ * PUT /users/:id
+ */
+export const updateProfile = async (
+  id: string,
+  payload: UpdateProfilePayload,
+): Promise<{ message: string; success?: boolean; user?: User }> => {
+  try {
+    const response = await api.put(`/users/${id}`, payload);
     return response.data;
   } catch (error: any) {
     if (error.response) {
@@ -160,4 +187,5 @@ export default {
   getUser,
   clearSession,
   initializeSession,
+  updateProfile,
 };
