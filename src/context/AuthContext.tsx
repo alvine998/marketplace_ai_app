@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { User, initializeSession, logout as logoutService, saveUser } from '../services/authService';
+import { User, initializeSession, logout as logoutService, saveUser, updateProfile } from '../services/authService';
 
 interface AuthUser extends User {
     avatar?: string;
@@ -53,6 +53,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = async () => {
         try {
+            // Remove FCM Token from server before logging out
+            if (user && user.id) {
+                const currentTokens = user.fcmTokens || [];
+                const filteredTokens = currentTokens.filter(t => t !== 'fcm_token');
+
+                try {
+                    await updateProfile(user.id, { fcmTokens: filteredTokens });
+                } catch (fcmError) {
+                    console.error('Failed to remove FCM token on server:', fcmError);
+                }
+            }
             await logoutService();
         } catch (error) {
             console.error('Logout error:', error);

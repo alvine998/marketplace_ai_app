@@ -12,15 +12,47 @@ import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useCart } from '../../context/CartContext';
+import { RefreshControl } from 'react-native';
+import Skeleton from '../../components/Common/Skeleton';
 
 const CartScreen = ({ navigation }: any) => {
-    const { cartItems, removeFromCart, updateQuantity, totalAmount } = useCart();
+    const { cartItems, removeFromCart, updateQuantity, totalAmount, isLoading, fetchCart } = useCart();
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
 
-    const renderItem = ({ item }: any) => (
+    const onRefresh = async () => {
+        setIsRefreshing(true);
+        await fetchCart();
+        setIsRefreshing(false);
+    };
+
+    const renderSkeleton = () => (
+        <View style={styles.listContainer}>
+            {[1, 2, 3].map((i) => (
+                <View key={i} style={styles.cartItem}>
+                    <View style={styles.itemHeader}>
+                        <Skeleton width={normalize(20)} height={normalize(20)} borderRadius={2} />
+                        <Skeleton width={normalize(100)} height={normalize(16)} style={{ marginLeft: SPACING.sm }} />
+                    </View>
+                    <View style={styles.itemContent}>
+                        <Skeleton width={normalize(80)} height={normalize(80)} borderRadius={SIZES.radius} />
+                        <View style={styles.itemDetails}>
+                            <Skeleton width="90%" height={normalize(14)} style={{ marginBottom: 8 }} />
+                            <Skeleton width="40%" height={normalize(16)} style={{ marginBottom: 12 }} />
+                            <View style={styles.quantityRow}>
+                                <Skeleton width={normalize(80)} height={normalize(28)} borderRadius={14} />
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            ))}
+        </View>
+    );
+
+    const renderItem = ({ item }: { item: any }) => (
         <View style={styles.cartItem}>
             <View style={styles.itemHeader}>
                 <Icon name="check-square" size={normalize(20)} color={COLORS.primary} />
-                <Text style={styles.shopName}>Official Store</Text>
+                <Text style={styles.shopName}>{item.shopName || 'Official Store'}</Text>
             </View>
             <View style={styles.itemContent}>
                 <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
@@ -66,24 +98,31 @@ const CartScreen = ({ navigation }: any) => {
                 <Text style={styles.headerTitle}>Keranjang</Text>
             </View>
 
-            <FlatList
-                data={cartItems}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                contentContainerStyle={styles.listContainer}
-                ListEmptyComponent={
-                    <View style={styles.emptyState}>
-                        <Icon name="shopping-cart" size={normalize(64)} color={COLORS.lightGrey} />
-                        <Text style={styles.emptyText}>Wah, keranjang belanjaanmu kosong!</Text>
-                        <TouchableOpacity
-                            style={styles.shopNowButton}
-                            onPress={() => navigation.navigate('HomeMain')}
-                        >
-                            <Text style={styles.shopNowText}>Mulai Belanja</Text>
-                        </TouchableOpacity>
-                    </View>
-                }
-            />
+            {isLoading && !isRefreshing ? (
+                renderSkeleton()
+            ) : (
+                <FlatList
+                    data={cartItems}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.listContainer}
+                    refreshControl={
+                        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
+                    }
+                    ListEmptyComponent={
+                        <View style={styles.emptyState}>
+                            <Icon name="shopping-cart" size={normalize(64)} color={COLORS.lightGrey} />
+                            <Text style={styles.emptyText}>Wah, keranjang belanjaanmu kosong!</Text>
+                            <TouchableOpacity
+                                style={styles.shopNowButton}
+                                onPress={() => navigation.navigate('HomeMain')}
+                            >
+                                <Text style={styles.shopNowText}>Mulai Belanja</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
+                />
+            )}
 
             {cartItems.length > 0 && (
                 <View style={styles.footer}>

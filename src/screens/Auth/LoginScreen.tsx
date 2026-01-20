@@ -17,7 +17,7 @@ import Toast from 'react-native-toast-message';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import { useAuth } from '../../context/AuthContext';
-import { login as loginService } from '../../services/authService';
+import { login as loginService, updateProfile } from '../../services/authService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -50,6 +50,14 @@ const LoginScreen = ({ navigation }: any) => {
 
             if (response.token && response.user) {
                 login(response.user, response.token);
+
+                // Update FCM Token in background
+                try {
+                    await updateProfile(response.user.id, { fcmTokens: ['fcm_token'] });
+                } catch (fcmError) {
+                    console.error('Failed to update FCM token:', fcmError);
+                }
+
                 navigation.replace('Main');
                 Toast.show({
                     type: 'success',

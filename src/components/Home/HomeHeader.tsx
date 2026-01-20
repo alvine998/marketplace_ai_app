@@ -14,15 +14,39 @@ import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import SearchOverlay from './SearchOverlay';
 import { useCart } from '../../context/CartContext';
+import { getHomeCounts, HomeCounts } from '../../services/dashboardService';
 
 const HomeHeader = () => {
     const navigation = useNavigation<DrawerNavigationProp<any>>();
     const [searchVisible, setSearchVisible] = React.useState(false);
     const { itemCount } = useCart();
+    const [counts, setCounts] = React.useState<HomeCounts>({
+        unreadNotifications: 0,
+        cartItems: 0,
+        unreadChats: 0,
+    });
 
-    // Mock unread counts
-    const unreadMessages = 2;
-    const unreadNotifications = 5;
+    React.useEffect(() => {
+        const fetchCounts = async () => {
+            try {
+                const response = await getHomeCounts();
+                if (response.success) {
+                    setCounts(response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching home counts:', error);
+            }
+        };
+
+        fetchCounts();
+
+        // Refresh counts when screen is focused
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchCounts();
+        });
+
+        return unsubscribe;
+    }, [navigation]);
 
     const renderBadge = (count: number) => {
         if (count <= 0) return null;
@@ -54,7 +78,7 @@ const HomeHeader = () => {
                     >
                         <View>
                             <Icon name="mail" size={normalize(22)} color={COLORS.white} />
-                            {renderBadge(unreadMessages)}
+                            {renderBadge(counts.unreadChats)}
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -63,7 +87,7 @@ const HomeHeader = () => {
                     >
                         <View>
                             <Icon name="bell" size={normalize(22)} color={COLORS.white} />
-                            {renderBadge(unreadNotifications)}
+                            {renderBadge(counts.unreadNotifications)}
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -72,7 +96,7 @@ const HomeHeader = () => {
                     >
                         <View>
                             <Icon name="shopping-cart" size={normalize(22)} color={COLORS.white} />
-                            {renderBadge(itemCount)}
+                            {renderBadge(counts.cartItems || itemCount)}
                         </View>
                     </TouchableOpacity>
                     {/* <TouchableOpacity

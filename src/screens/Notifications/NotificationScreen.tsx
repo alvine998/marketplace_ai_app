@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     View,
     Text,
@@ -6,103 +6,162 @@ import {
     FlatList,
     TouchableOpacity,
     SafeAreaView,
+    RefreshControl,
+    ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
-import { notificationService, Notification } from '../../services/notificationService';
+import { useAuth } from '../../context/AuthContext';
+import { getNotifications, Notification } from '../../services/notificationService';
+import Skeleton from '../../components/Common/Skeleton';
+import { useNavigation } from '@react-navigation/native';
 
-const NOTIFICATIONS = [
-    {
-        id: '1',
-        title: 'Pesanan Telah Sampai',
-        message: 'Pesanan INV/20231227/MPL/3654218907 telah sampai di tujuan. Jangan lupa konfirmasi pesanan ya!',
-        time: '2 jam yang lalu',
-        type: 'transaction',
-        icon: 'package',
-    },
-    {
-        id: '2',
-        title: 'Promo Flash Sale!',
-        message: 'Diskon hingga 90% untuk produk pilihan hari ini. Cek sekarang sebelum kehabisan!',
-        time: '5 jam yang lalu',
-        type: 'promo',
-        icon: 'zap',
-    },
-    {
-        id: '3',
-        title: 'Keamanan Akun',
-        message: 'Ada upaya login baru ke akunmu. Jika ini bukan kamu, segera amankan akunmu.',
-        time: '1 hari yang lalu',
-        type: 'info',
-        icon: 'shield',
-    },
-];
-
-const NotificationScreen = ({ navigation }: any) => {
+const NotificationScreen = () => {
+    const navigation = useNavigation<any>();
+    const { user } = useAuth();
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+
+    const fetchNotifications = useCallback(async (pageNum: number, refresh = false) => {
+        if (!user?.id) return;
+
+        try {
+            const response = await getNotifications({
+                userId: user.id,
+                page: pageNum,
+                limit: 10,
+            });
+
+            if (refresh) {
+                setNotifications(response.data || []);
+            } else {
+                setNotifications(prev => [...prev, ...(response.data || [])]);
+            }
+
+            setHasMore(response.currentPage < response.totalPages);
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        } finally {
+            setIsLoading(false);
+            setIsRefreshing(false);
+            setIsLoadingMore(false);
+        }
+    }, [user?.id]);
 
     useEffect(() => {
-        fetchNotifications();
-    }, []);
+        fetchNotifications(1, true);
+    }, [fetchNotifications]);
 
-    const fetchNotifications = async () => {
-        setLoading(true);
-        const data = await notificationService.getNotifications();
-        setNotifications(data);
-        setLoading(false);
+    const handleRefresh = () => {
+        setIsRefreshing(true);
+        setPage(1);
+        fetchNotifications(1, true);
     };
 
-    const renderItem = ({ item }: { item: Notification }) => (
-        <TouchableOpacity style={styles.notificationItem}>
-            <View style={[styles.iconContainer, (styles as any)[item.type] || styles.info]}>
-                <Icon
-                    name={item.type === 'order' ? 'package' : item.type === 'promo' ? 'zap' : 'message-circle'}
-                    size={normalize(20)}
-                    color={COLORS.white}
-                />
-            </View>
-            <View style={styles.content}>
-                <View style={styles.itemHeader}>
-                    <Text style={styles.itemTitle}>{item.title}</Text>
-                    <View style={styles.rightContent}>
-                        <Text style={styles.itemTime}>Baru saja</Text>
-                        {!item.isRead && <View style={styles.unreadDot} />}
+    const handleLoadMore = () => {
+        if (!hasMore || isLoadingMore) return;
+        setIsLoadingMore(true);
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchNotifications(nextPage);
+    };
+
+    const renderSkeleton = () => (
+        <View style={styles.skeletonContainer}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+                <View key={i} style={styles.notificationItem}>
+                    <Skeleton width={normalize(40)} height={normalize(40)} borderRadius={normalize(20)} />
+                    <View style={styles.textContainer}>
+                        <Skeleton width="60%" height={normalize(14)} style={{ marginBottom: 6 }} />
+                        <Skeleton width="90%" height={normalize(12)} style={{ marginBottom: 4 }} />
+                        <Skeleton width="30%" height={normalize(10)} />
                     </View>
                 </View>
-                <Text style={styles.itemMessage} numberOfLines={2}>{item.message}</Text>
-            </View>
-        </TouchableOpacity>
+            ))}
+        </View>
     );
+
+    const getIcon = (type: string) => {
+        switch (type) {
+            case 'order':
+                return { name: 'shopping-bag', color: COLORS.primary };
+            case 'promo':
+                return { name: 'tag', color: '#FF9800' };
+            default:
+                return { name: 'bell', color: COLORS.grey };
+        }
+    };
+
+    const renderItem = ({ item }: { item: Notification }) => {
+        const iconInfo = getIcon(item.type);
+        return (
+            <TouchableOpacity
+                style={[styles.notificationItem, !item.isRead && styles.unreadItem]}
+                onPress={() => {
+                    // Placeholder for future detail navigation
+                }}
+            >
+                <View style={[styles.iconContainer, { backgroundColor: iconInfo.color + '15' }]}>
+                    <Icon name={iconInfo.name} size={normalize(20)} color={iconInfo.color} />
+                </View>
+                <View style={styles.textContainer}>
+                    <View style={styles.titleRow}>
+                        <Text style={styles.title}>{item.title}</Text>
+                        {!item.isRead && <View style={styles.unreadDot} />}
+                    </View>
+                    <Text style={styles.message} numberOfLines={2}>{item.message}</Text>
+                    <Text style={styles.time}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    };
+
+    const renderFooter = () => {
+        if (!isLoadingMore) return null;
+        return (
+            <View style={styles.footerLoader}>
+                <ActivityIndicator size="small" color={COLORS.primary} />
+            </View>
+        );
+    };
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Icon name="arrow-left" size={normalize(24)} color={COLORS.black} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Notifikasi</Text>
+                <View style={{ width: 24 }} />
             </View>
 
-            <View style={styles.tabs}>
-                <TouchableOpacity style={[styles.tab, styles.activeTab]}>
-                    <Text style={[styles.tabText, styles.activeTabText]}>Transaksi</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.tab}>
-                    <Text style={styles.tabText}>Update</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.tab}>
-                    <Text style={styles.tabText}>Promo</Text>
-                </TouchableOpacity>
-            </View>
-
-            <FlatList
-                data={notifications}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                contentContainerStyle={styles.listContainer}
-            />
+            {isLoading ? (
+                renderSkeleton()
+            ) : (
+                <FlatList
+                    data={notifications}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={styles.listContent}
+                    onEndReached={handleLoadMore}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={renderFooter}
+                    refreshControl={
+                        <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} colors={[COLORS.primary]} />
+                    }
+                    ListEmptyComponent={
+                        <View style={styles.emptyContainer}>
+                            <Icon name="bell-off" size={normalize(60)} color={COLORS.border} />
+                            <Text style={styles.emptyText}>Belum ada notifikasi</Text>
+                        </View>
+                    }
+                />
+            )}
         </SafeAreaView>
     );
 };
@@ -115,100 +174,88 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: SPACING.md,
-        height: normalize(56),
+        paddingVertical: SPACING.sm,
         borderBottomWidth: 1,
         borderBottomColor: COLORS.border,
+    },
+    backButton: {
+        padding: 4,
     },
     headerTitle: {
         fontSize: normalize(18),
         fontWeight: 'bold',
         color: COLORS.black,
-        marginLeft: SPACING.md,
     },
-    tabs: {
-        flexDirection: 'row',
-        paddingHorizontal: SPACING.md,
-        paddingTop: SPACING.md,
-        paddingBottom: SPACING.sm,
-    },
-    tab: {
-        paddingHorizontal: SPACING.md,
-        paddingVertical: SPACING.xs,
-        borderRadius: 20,
-        marginRight: SPACING.sm,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-    },
-    activeTab: {
-        backgroundColor: COLORS.primary + '20',
-        borderColor: COLORS.primary,
-    },
-    tabText: {
-        fontSize: normalize(14),
-        color: COLORS.grey,
-    },
-    activeTabText: {
-        color: COLORS.primary,
-        fontWeight: 'bold',
-    },
-    listContainer: {
-        padding: SPACING.md,
+    listContent: {
+        flexGrow: 1,
     },
     notificationItem: {
         flexDirection: 'row',
-        marginBottom: SPACING.xl,
+        padding: SPACING.md,
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.border,
+        alignItems: 'flex-start',
+    },
+    unreadItem: {
+        backgroundColor: COLORS.primary + '05',
     },
     iconContainer: {
         width: normalize(40),
         height: normalize(40),
-        borderRadius: 20,
-        justifyContent: 'center',
+        borderRadius: normalize(20),
         alignItems: 'center',
+        justifyContent: 'center',
         marginRight: SPACING.md,
     },
-    transaction: {
-        backgroundColor: COLORS.primary,
-    },
-    promo: {
-        backgroundColor: '#FF5722',
-    },
-    info: {
-        backgroundColor: '#2196F3',
-    },
-    content: {
+    textContainer: {
         flex: 1,
     },
-    itemHeader: {
+    titleRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
         marginBottom: 4,
     },
-    itemTitle: {
+    title: {
         fontSize: normalize(14),
-        fontWeight: 'bold',
+        fontWeight: '600',
         color: COLORS.black,
-    },
-    itemTime: {
-        fontSize: normalize(12),
-        color: COLORS.grey,
-    },
-    rightContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
     },
     unreadDot: {
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: '#FF4D4D',
-        marginLeft: SPACING.sm,
+        backgroundColor: COLORS.primary,
     },
-    itemMessage: {
+    message: {
         fontSize: normalize(13),
         color: COLORS.grey,
         lineHeight: normalize(18),
+        marginBottom: 6,
+    },
+    time: {
+        fontSize: normalize(11),
+        color: COLORS.grey,
+    },
+    skeletonContainer: {
+        flex: 1,
+    },
+    footerLoader: {
+        paddingVertical: SPACING.md,
+        alignItems: 'center',
+    },
+    emptyContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: normalize(100),
+    },
+    emptyText: {
+        marginTop: SPACING.md,
+        fontSize: normalize(16),
+        color: COLORS.grey,
     },
 });
 

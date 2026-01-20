@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { notificationService } from '../services/notificationService';
+import { updateProfile } from '../services/authService';
 
 const NotificationHandler: React.FC = () => {
     const { isLoggedIn, user, updateFcmToken } = useAuth();
@@ -23,8 +23,8 @@ const NotificationHandler: React.FC = () => {
             // 1. Update token in local context
             updateFcmToken(mockToken);
 
-            // 2. Register token on the backend via the notification service
-            await notificationService.updateFcmToken(user!.id, mockToken);
+            // 2. Register token on the backend via the auth service (update user)
+            await updateProfile(user!.id, { fcmTokens: [mockToken] });
 
             console.log('FCM Token registered successfully:', mockToken);
         } catch (error) {

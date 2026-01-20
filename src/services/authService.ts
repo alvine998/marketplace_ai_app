@@ -28,6 +28,7 @@ export interface User {
   gender?: string;
   address?: string;
   role?: string;
+  fcmTokens?: string[];
 }
 
 export interface LoginResponse {
@@ -99,10 +100,11 @@ export const initializeSession = async (): Promise<{
 };
 
 export interface UpdateProfilePayload {
-  name: string;
-  email: string;
-  phone: string;
-  gender: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  gender?: string;
+  fcmTokens?: string[];
 }
 
 /**

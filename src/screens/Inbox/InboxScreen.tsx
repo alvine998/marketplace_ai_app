@@ -11,48 +11,95 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
-
-const CHATS = [
-    {
-        id: '1',
-        shopName: 'Official Store',
-        lastMessage: 'Halo, stok iPhone 15 Pro Blue Titanium ready ya kak. Silahkan diorder.',
-        time: '10:30',
-        unreadCount: 1,
-        imageUrl: 'https://picsum.photos/seed/shop1/100/100',
-    },
-    {
-        id: '2',
-        shopName: 'Samsung Official',
-        lastMessage: 'Pesanan sedang diproses dan akan segera dikirim.',
-        time: 'Kemarin',
-        unreadCount: 0,
-        imageUrl: 'https://picsum.photos/seed/shop2/100/100',
-    },
-    {
-        id: '3',
-        shopName: 'Sony Center',
-        lastMessage: 'Baik, ditunggu konfirmasinya.',
-        time: 'Senin',
-        unreadCount: 0,
-        imageUrl: 'https://picsum.photos/seed/shop3/100/100',
-    },
-];
+import { useAuth } from '../../context/AuthContext';
+import { getChatRooms, ChatRoom } from '../../services/chatService';
+import { RefreshControl } from 'react-native';
+import Skeleton from '../../components/Common/Skeleton';
+import { formatDistanceToNow } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 const InboxScreen = ({ navigation }: any) => {
-    const renderItem = ({ item }: any) => (
+    const { user, isLoggedIn } = useAuth();
+    const [rooms, setRooms] = React.useState<ChatRoom[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+    const fetchRooms = async (showLoading = true) => {
+        if (!isLoggedIn || !user?.id) return;
+
+        if (showLoading) setIsLoading(true);
+        try {
+            const data = await getChatRooms(user.id);
+            setRooms(data);
+        } catch (error) {
+            console.error('Error fetching chat rooms:', error);
+        } finally {
+            if (showLoading) setIsLoading(false);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchRooms();
+    }, [isLoggedIn, user?.id]);
+
+    const onRefresh = async () => {
+        setIsRefreshing(true);
+        await fetchRooms(false);
+        setIsRefreshing(false);
+    };
+
+    const formatTime = (dateString: string) => {
+        try {
+            return formatDistanceToNow(new Date(dateString), {
+                addSuffix: true,
+                locale: id,
+            });
+        } catch (e) {
+            return dateString;
+        }
+    };
+
+    const renderSkeleton = () => (
+        <View style={styles.listContainer}>
+            {[1, 2, 3, 4, 5].map((i) => (
+                <View key={i} style={styles.chatItem}>
+                    <Skeleton width={normalize(50)} height={normalize(50)} borderRadius={25} />
+                    <View style={styles.content}>
+                        <View style={styles.itemHeader}>
+                            <Skeleton width={normalize(120)} height={normalize(16)} />
+                            <Skeleton width={normalize(60)} height={normalize(12)} />
+                        </View>
+                        <View style={styles.messageRow}>
+                            <Skeleton width="80%" height={normalize(13)} style={{ marginTop: 8 }} />
+                        </View>
+                    </View>
+                </View>
+            ))}
+        </View>
+    );
+
+    const renderItem = ({ item }: { item: ChatRoom }) => (
         <TouchableOpacity
             style={styles.chatItem}
             onPress={() => navigation.navigate('ChatDetail', {
-                shopName: item.shopName,
-                imageUrl: item.imageUrl
+                roomId: item.id,
+                participantName: item.participant.username,
+                participantId: item.participant.id
             })}
         >
-            <Image source={{ uri: item.imageUrl }} style={styles.shopImage} />
+            <View style={styles.shopImageContainer}>
+                {item.participant.avatar ? (
+                    <Image source={{ uri: item.participant.avatar }} style={styles.shopImage} />
+                ) : (
+                    <View style={[styles.shopImage, styles.avatarPlaceholder]}>
+                        <Icon name="user" size={normalize(24)} color={COLORS.grey} />
+                    </View>
+                )}
+            </View>
             <View style={styles.content}>
                 <View style={styles.itemHeader}>
-                    <Text style={styles.shopName}>{item.shopName}</Text>
-                    <Text style={styles.itemTime}>{item.time}</Text>
+                    <Text style={styles.shopName}>{item.participant.username}</Text>
+                    <Text style={styles.itemTime}>{formatTime(item.updatedAt)}</Text>
                 </View>
                 <View style={styles.messageRow}>
                     <Text style={styles.lastMessage} numberOfLines={1}>{item.lastMessage}</Text>
@@ -83,12 +130,25 @@ const InboxScreen = ({ navigation }: any) => {
                 <Text style={styles.searchPlaceholder}>Cari kontak atau pesan</Text>
             </View>
 
-            <FlatList
-                data={CHATS}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                contentContainerStyle={styles.listContainer}
-            />
+            {isLoading && !isRefreshing ? (
+                renderSkeleton()
+            ) : (
+                <FlatList
+                    data={rooms}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.listContainer}
+                    refreshControl={
+                        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
+                    }
+                    ListEmptyComponent={
+                        <View style={styles.emptyState}>
+                            <Icon name="message-square" size={normalize(64)} color={COLORS.lightGrey} />
+                            <Text style={styles.emptyText}>Belum ada pesan masuk</Text>
+                        </View>
+                    }
+                />
+            )}
         </SafeAreaView>
     );
 };
@@ -144,6 +204,24 @@ const styles = StyleSheet.create({
         height: normalize(50),
         borderRadius: 25,
         backgroundColor: COLORS.lightGrey,
+    },
+    shopImageContainer: {
+        position: 'relative',
+    },
+    avatarPlaceholder: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyState: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: normalize(100),
+    },
+    emptyText: {
+        fontSize: normalize(16),
+        color: COLORS.grey,
+        marginTop: SPACING.md,
     },
     content: {
         flex: 1,

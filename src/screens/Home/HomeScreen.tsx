@@ -26,6 +26,7 @@ import PromotionModal from '../../components/Home/PromotionModal';
 import FlashSale from '../../components/Home/FlashSale';
 import AdCard from '../../components/Home/AdCard';
 import { useAuth } from '../../context/AuthContext';
+import HomeSkeleton from '../../components/Home/HomeSkeleton';
 
 const PRODUCT_DATA = [
     {
@@ -109,9 +110,19 @@ const PRODUCT_DATA = [
 const HomeScreen = ({ navigation }: any) => {
     const { t } = useTranslation();
     const { isLoggedIn } = useAuth();
+    const [isLoading, setIsLoading] = React.useState(true);
     const [refreshing, setRefreshing] = React.useState(false);
     const [promoVisible, setPromoVisible] = React.useState(false);
     const [backPressCount, setBackPressCount] = React.useState(0);
+
+    React.useEffect(() => {
+        // Simulate initial loading
+        const loadTimer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+
+        return () => clearTimeout(loadTimer);
+    }, []);
 
     React.useEffect(() => {
         const backAction = () => {
@@ -234,17 +245,21 @@ const HomeScreen = ({ navigation }: any) => {
     return (
         <View style={styles.container}>
             <HomeHeader />
-            <FlatList
-                data={PRODUCT_DATA}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                ListHeaderComponent={renderHeader}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.listContent}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                }
-            />
+            {isLoading ? (
+                <HomeSkeleton />
+            ) : (
+                <FlatList
+                    data={PRODUCT_DATA}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderItem}
+                    ListHeaderComponent={renderHeader}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.listContent}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
+                />
+            )}
             <PromotionModal
                 visible={promoVisible}
                 onClose={() => setPromoVisible(false)}
