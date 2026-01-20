@@ -121,7 +121,7 @@ const InboxScreen = ({ navigation }: any) => {
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Chat</Text>
                 <TouchableOpacity style={styles.headerIcon}>
-                    <Icon name="settings" size={normalize(22)} color={COLORS.black} />
+                    {/* <Icon name="settings" size={normalize(22)} color={COLORS.black} /> */}
                 </TouchableOpacity>
             </View>
 

@@ -12,66 +12,162 @@ import {
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import Icon from 'react-native-vector-icons/Feather';
+import { useAuth } from '../../context/AuthContext';
+import { getTransactions, Transaction, TransactionStatus } from '../../services/transactionService';
+import Skeleton from '../../components/Common/Skeleton';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { ScrollView } from 'react-native-gesture-handler';
 
-const TRANSACTION_DATA = [
-    {
-        id: '1',
-        status: 'Selesai',
-        date: '28 Des 2025',
-        title: 'Apple iPhone 15 Pro 128GB Blue Titanium',
-        totalPrice: 'Rp 18.515.000',
-        imageUrl: 'https://picsum.photos/seed/p1/200/200',
-        quantity: 1,
-    },
-    {
-        id: '2',
-        status: 'Dikirim',
-        date: '29 Des 2025',
-        title: 'Sony WH-1000XM5 Wireless Noise Cancelling',
-        totalPrice: 'Rp 4.515.000',
-        imageUrl: 'https://picsum.photos/seed/p3/200/200',
-        quantity: 1,
-    },
+const STATUS_TABS: { label: string; value: TransactionStatus | 'all' }[] = [
+    { label: 'Semua', value: 'all' },
+    { label: 'Menunggu', value: 'pending' },
+    { label: 'Dibayar', value: 'paid' },
+    { label: 'Dikirim', value: 'shipped' },
+    { label: 'Selesai', value: 'completed' },
+    { label: 'Dibatalkan', value: 'cancelled' },
 ];
 
 const TransactionScreen = () => {
-    const [refreshing, setRefreshing] = React.useState(false);
+    const { user, isLoggedIn } = useAuth();
+    const [transactions, setTransactions] = React.useState<Transaction[]>([]);
+    const [status, setStatus] = React.useState<TransactionStatus | 'all'>('all');
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
+    const [page, setPage] = React.useState(1);
+    const [hasMore, setHasMore] = React.useState(true);
 
-    const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        setTimeout(() => setRefreshing(false), 2000);
-    }, []);
+    const fetchTransactionsData = async (pageNum: number, shouldAppend: boolean = false) => {
+        if (!isLoggedIn || !user?.id) return;
 
-    const renderItem = ({ item }: { item: any }) => (
-        <View style={styles.card}>
-            <View style={styles.cardHeader}>
-                <View style={[styles.statusBadge, { backgroundColor: item.status === 'Selesai' ? '#E8F5E9' : '#FFF3E0' }]}>
-                    <Text style={[styles.statusText, { color: item.status === 'Selesai' ? COLORS.primary : '#F57C00' }]}>
-                        {item.status}
-                    </Text>
+        if (pageNum === 1 && !isRefreshing) setIsLoading(true);
+
+        try {
+            const response = await getTransactions(user.id, status, pageNum);
+            if (response.data) {
+                setTransactions(prev => shouldAppend ? [...prev, ...response.data] : response.data);
+                setHasMore(response.currentPage < response.totalPages);
+            }
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+        } finally {
+            setIsLoading(false);
+            setIsRefreshing(false);
+        }
+    };
+
+    React.useEffect(() => {
+        setPage(1);
+        fetchTransactionsData(1);
+    }, [isLoggedIn, user?.id, status]);
+
+    const onRefresh = () => {
+        setIsRefreshing(true);
+        setPage(1);
+        fetchTransactionsData(1);
+    };
+
+    const loadMore = () => {
+        if (!isLoading && hasMore) {
+            const nextPage = page + 1;
+            setPage(nextPage);
+            fetchTransactionsData(nextPage, true);
+        }
+    };
+
+    const getStatusInfo = (status: TransactionStatus) => {
+        switch (status) {
+            case 'completed':
+                return { label: 'Selesai', color: COLORS.primary, bg: '#E8F5E9' };
+            case 'pending':
+                return { label: 'Menunggu', color: '#F57C00', bg: '#FFF3E0' };
+            case 'paid':
+                return { label: 'Dibayar', color: '#2196F3', bg: '#E3F2FD' };
+            case 'shipped':
+                return { label: 'Dikirim', color: '#9C27B0', bg: '#F3E5F5' };
+            case 'cancelled':
+                return { label: 'Dibatalkan', color: '#D32F2F', bg: '#FFEBEE' };
+            default:
+                return { label: status, color: COLORS.grey, bg: '#F5F5F5' };
+        }
+    };
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+        }).format(amount).replace('IDR', 'Rp');
+    };
+
+    const formatDate = (dateString: string) => {
+        try {
+            return format(new Date(dateString), 'dd MMM yyyy, HH:mm', { locale: id });
+        } catch (e) {
+            return dateString;
+        }
+    };
+
+    const renderSkeleton = () => (
+        <View style={styles.listContent}>
+            {[1, 2, 3].map((i) => (
+                <View key={i} style={styles.card}>
+                    <View style={styles.cardHeader}>
+                        <Skeleton width={normalize(70)} height={normalize(20)} borderRadius={4} />
+                        <Skeleton width={normalize(100)} height={normalize(12)} />
+                    </View>
+                    <View style={styles.productRow}>
+                        <Skeleton width={normalize(50)} height={normalize(50)} borderRadius={4} />
+                        <View style={styles.productInfo}>
+                            <Skeleton width="80%" height={normalize(14)} style={{ marginBottom: 4 }} />
+                            <Skeleton width="40%" height={normalize(12)} />
+                        </View>
+                    </View>
+                    <View style={styles.cardFooter}>
+                        <View>
+                            <Skeleton width={normalize(60)} height={normalize(10)} style={{ marginBottom: 4 }} />
+                            <Skeleton width={normalize(100)} height={normalize(16)} />
+                        </View>
+                        <Skeleton width={normalize(80)} height={normalize(32)} borderRadius={6} />
+                    </View>
                 </View>
-                <Text style={styles.dateText}>{item.date}</Text>
-            </View>
-
-            <View style={styles.productRow}>
-                <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
-                <View style={styles.productInfo}>
-                    <Text style={styles.productTitle} numberOfLines={1}>{item.title}</Text>
-                    <Text style={styles.quantityText}>{item.quantity} Barang</Text>
-                </View>
-            </View>
-
-            <View style={styles.cardFooter}>
-                <View>
-                    <Text style={styles.totalLabel}>Total Belanja</Text>
-                    <Text style={styles.totalPrice}>{item.totalPrice}</Text>
-                </View>
-                <TouchableOpacity style={styles.actionButton}>
-                    <Text style={styles.actionButtonText}>Beli Lagi</Text>
-                </TouchableOpacity>
-            </View>
+            ))}
         </View>
     );
+
+    const renderItem = ({ item }: { item: Transaction }) => {
+        const statusInfo = getStatusInfo(item.status);
+        return (
+            <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                    <View style={[styles.statusBadge, { backgroundColor: statusInfo.bg }]}>
+                        <Text style={[styles.statusText, { color: statusInfo.color }]}>
+                            {statusInfo.label}
+                        </Text>
+                    </View>
+                    <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
+                </View>
+
+                <View style={styles.productRow}>
+                    <Icon name="package" size={normalize(40)} color={COLORS.lightGrey} style={styles.productIcon} />
+                    <View style={styles.productInfo}>
+                        <Text style={styles.productTitle} numberOfLines={1}>Transaksi #{item.id.slice(0, 8)}</Text>
+                        <Text style={styles.quantityText}>Melalui {item.paymentMethod.replace('_', ' ')}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.cardFooter}>
+                    <View>
+                        <Text style={styles.totalLabel}>Total Belanja</Text>
+                        <Text style={styles.totalPrice}>{formatCurrency(item.totalAmount)}</Text>
+                    </View>
+                    <TouchableOpacity style={styles.actionButton}>
+                        <Text style={styles.actionButtonText}>Detail</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -82,21 +178,43 @@ const TransactionScreen = () => {
                 </TouchableOpacity>
             </View>
 
-            <FlatList
-                data={TRANSACTION_DATA}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.listContent}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                }
-                ListEmptyComponent={
-                    <View style={styles.emptyContainer}>
-                        <Icon name="list" size={80} color={COLORS.lightGrey} />
-                        <Text style={styles.emptyText}>Belum ada transaksi</Text>
-                    </View>
-                }
-            />
+            <View style={styles.tabsContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContent}>
+                    {STATUS_TABS.map((tab) => (
+                        <TouchableOpacity
+                            key={tab.value}
+                            style={[styles.tab, status === tab.value && styles.activeTab]}
+                            onPress={() => setStatus(tab.value)}
+                        >
+                            <Text style={[styles.tabText, status === tab.value && styles.activeTabText]}>
+                                {tab.label}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            </View>
+
+            {isLoading && !isRefreshing ? (
+                renderSkeleton()
+            ) : (
+                <FlatList
+                    data={transactions}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={styles.listContent}
+                    refreshControl={
+                        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
+                    }
+                    onEndReached={loadMore}
+                    onEndReachedThreshold={0.5}
+                    ListEmptyComponent={
+                        <View style={styles.emptyContainer}>
+                            <Icon name="list" size={80} color={COLORS.lightGrey} />
+                            <Text style={styles.emptyText}>Belum ada transaksi</Text>
+                        </View>
+                    }
+                />
+            )}
         </SafeAreaView>
     );
 };
@@ -163,6 +281,38 @@ const styles = StyleSheet.create({
         paddingVertical: SPACING.sm,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
+    },
+    productIcon: {
+        marginRight: SPACING.sm,
+    },
+    tabsContainer: {
+        backgroundColor: COLORS.white,
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.border,
+    },
+    tabsContent: {
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm,
+    },
+    tab: {
+        paddingHorizontal: SPACING.md,
+        paddingVertical: 6,
+        borderRadius: 20,
+        marginRight: SPACING.sm,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+    },
+    activeTab: {
+        backgroundColor: COLORS.primary,
+        borderColor: COLORS.primary,
+    },
+    tabText: {
+        fontSize: normalize(13),
+        color: COLORS.grey,
+    },
+    activeTabText: {
+        color: COLORS.white,
+        fontWeight: 'bold',
     },
     productImage: {
         width: normalize(50),
