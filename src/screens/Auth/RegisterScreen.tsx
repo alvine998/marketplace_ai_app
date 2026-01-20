@@ -10,25 +10,32 @@ import {
     Dimensions,
     KeyboardAvoidingView,
     Platform,
+    Modal,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
+
+const GENDER_OPTIONS = [
+    { label: 'Laki-laki', value: 'Laki-laki' },
+    { label: 'Perempuan', value: 'Perempuan' },
+];
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
-import { useAuth } from '../../context/AuthContext';
+import { register } from '../../services/authService';
 
 const { width } = Dimensions.get('window');
 
 const RegisterScreen = ({ navigation }: any) => {
-    const { login } = useAuth();
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
     const [gender, setGender] = useState('');
     const [address, setAddress] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [showGenderModal, setShowGenderModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (!fullName || !phone || !password) {
             Toast.show({
                 type: 'error',
@@ -38,14 +45,42 @@ const RegisterScreen = ({ navigation }: any) => {
             return;
         }
 
-        // Mock Registration
-        login({ id: Date.now().toString(), name: fullName, phone });
-        navigation.navigate('Main');
-        Toast.show({
-            type: 'success',
-            text1: 'Sukses',
-            text2: 'Akunmu berhasil dibuat!',
-        });
+        if (!gender) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Silakan pilih jenis kelamin',
+            });
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await register({
+                name: fullName,
+                phone,
+                gender,
+                address,
+                password,
+            });
+
+            if (response.message) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Sukses',
+                    text2: response.message || 'Akunmu berhasil dibuat!',
+                });
+                navigation.navigate('Login');
+            }
+        } catch (error: any) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error.message || 'Terjadi kesalahan saat mendaftar',
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -99,15 +134,61 @@ const RegisterScreen = ({ navigation }: any) => {
                             />
                         </View>
 
-                        <View style={styles.inputWrapper}>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Jenis Kelamin"
-                                placeholderTextColor="#A0A0A0"
-                                value={gender}
-                                onChangeText={setGender}
-                            />
-                        </View>
+                        {/* Gender Dropdown */}
+                        <TouchableOpacity
+                            style={styles.inputWrapper}
+                            onPress={() => setShowGenderModal(true)}
+                        >
+                            <View style={styles.dropdownContainer}>
+                                <Text style={gender ? styles.dropdownText : styles.dropdownPlaceholder}>
+                                    {gender || 'Jenis Kelamin'}
+                                </Text>
+                                <Icon name="chevron-down" size={normalize(20)} color="#B3B3B3" />
+                            </View>
+                        </TouchableOpacity>
+
+                        {/* Gender Modal */}
+                        <Modal
+                            visible={showGenderModal}
+                            transparent={true}
+                            animationType="fade"
+                            onRequestClose={() => setShowGenderModal(false)}
+                        >
+                            <TouchableOpacity
+                                style={styles.modalOverlay}
+                                activeOpacity={1}
+                                onPress={() => setShowGenderModal(false)}
+                            >
+                                <View style={styles.modalContent}>
+                                    <Text style={styles.modalTitle}>Pilih Jenis Kelamin</Text>
+                                    {GENDER_OPTIONS.map((option) => (
+                                        <TouchableOpacity
+                                            key={option.value}
+                                            style={[
+                                                styles.modalOption,
+                                                gender === option.value && styles.modalOptionSelected,
+                                            ]}
+                                            onPress={() => {
+                                                setGender(option.value);
+                                                setShowGenderModal(false);
+                                            }}
+                                        >
+                                            <Text
+                                                style={[
+                                                    styles.modalOptionText,
+                                                    gender === option.value && styles.modalOptionTextSelected,
+                                                ]}
+                                            >
+                                                {option.label}
+                                            </Text>
+                                            {gender === option.value && (
+                                                <Icon name="check" size={normalize(20)} color="#154AB4" />
+                                            )}
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </TouchableOpacity>
+                        </Modal>
 
                         <View style={[styles.inputWrapper, { height: normalize(100), alignItems: 'flex-start', paddingTop: SPACING.sm }]}>
                             <TextInput
@@ -301,6 +382,61 @@ const styles = StyleSheet.create({
         color: COLORS.black,
         textAlign: 'center',
         marginTop: SPACING.md,
+    },
+    // Dropdown styles
+    dropdownContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    dropdownText: {
+        fontSize: normalize(16),
+        color: COLORS.black,
+    },
+    dropdownPlaceholder: {
+        fontSize: normalize(16),
+        color: '#A0A0A0',
+    },
+    // Modal styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: COLORS.white,
+        borderRadius: normalize(16),
+        width: '80%',
+        paddingVertical: SPACING.lg,
+        paddingHorizontal: SPACING.md,
+    },
+    modalTitle: {
+        fontSize: normalize(18),
+        fontWeight: 'bold',
+        color: COLORS.black,
+        textAlign: 'center',
+        marginBottom: SPACING.md,
+    },
+    modalOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: SPACING.md,
+        paddingHorizontal: SPACING.sm,
+        borderRadius: normalize(8),
+    },
+    modalOptionSelected: {
+        backgroundColor: '#E8F0FE',
+    },
+    modalOptionText: {
+        fontSize: normalize(16),
+        color: COLORS.black,
+    },
+    modalOptionTextSelected: {
+        color: '#154AB4',
+        fontWeight: '600',
     },
 });
 
