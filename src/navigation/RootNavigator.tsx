@@ -42,6 +42,11 @@ import ProfileScreen from '../screens/Profile/ProfileScreen';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import FlashSaleScreen from '../screens/Home/FlashSaleScreen';
 import AdScreen from '../screens/Home/AdScreen';
+import AddProductScreen from '../screens/Seller/AddProductScreen';
+import SellerOrderCartScreen from '../screens/Seller/SellerOrderCartScreen';
+import SellerOrderHistoryScreen from '../screens/Seller/SellerOrderHistoryScreen';
+import SellerOrderDetailScreen from '../screens/Seller/SellerOrderDetailScreen';
+import EditProductScreen from '../screens/Seller/EditProductScreen';
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -63,6 +68,11 @@ const HomeStack = () => {
             <Stack.Screen name="AddressList" component={AddressListScreen} />
             <Stack.Screen name="AddAddress" component={AddAddressScreen} />
             <Stack.Screen name="BecomeSeller" component={BecomeSellerScreen} />
+            <Stack.Screen name="AddProduct" component={AddProductScreen} />
+            <Stack.Screen name="SellerOrderCart" component={SellerOrderCartScreen} />
+            <Stack.Screen name="SellerOrderHistory" component={SellerOrderHistoryScreen} />
+            <Stack.Screen name="SellerOrderDetail" component={SellerOrderDetailScreen} />
+            <Stack.Screen name="EditProduct" component={EditProductScreen} />
             <Stack.Screen name="CategoryProductList" component={CategoryProductListScreen} />
             <Stack.Screen name="AllCategories" component={AllCategoriesScreen} />
             <Stack.Screen name="Terms" component={TermsScreen} />
@@ -250,6 +260,11 @@ const RootNavigator = () => {
                 <Stack.Screen name="AddressList" component={AddressListScreen} />
                 {/* Flash Sale */}
                 <Stack.Screen name="FlashSale" component={FlashSaleScreen} />
+                <Stack.Screen name="BecomeSeller" component={BecomeSellerScreen} />
+                <Stack.Screen name="SellerOrderDetail" component={SellerOrderDetailScreen} />
+                <Stack.Screen name="SellerOrderHistory" component={SellerOrderHistoryScreen} />
+                <Stack.Screen name="EditProduct" component={EditProductScreen} />
+                <Stack.Screen name="AddProduct" component={AddProductScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

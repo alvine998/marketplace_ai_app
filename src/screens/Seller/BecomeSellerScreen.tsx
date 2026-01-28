@@ -11,13 +11,20 @@ import {
     Platform,
     Image,
     Alert,
+    Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
 import normalize from 'react-native-normalize';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '../../context/AuthContext';
-import { getSellerProfile, registerSeller, SellerProfile } from '../../services/sellerService';
+import {
+    getSellerProfile,
+    registerSeller,
+    SellerProfile,
+} from '../../services/sellerService';
+
+const { width } = Dimensions.get('window');
 
 const BecomeSellerScreen = ({ navigation }: any) => {
     const { user } = useAuth();
@@ -73,14 +80,10 @@ const BecomeSellerScreen = ({ navigation }: any) => {
                 description,
                 address,
                 userId: user.id,
-                // Logo upload requires an image picker library which is currently not installed.
-                // leaving it undefined for now as it matches the optional interface in service.
             });
 
-            // Check if successful (adjust based on your API response structure)
             if (response && !response.message?.toLowerCase().includes('error')) {
                 setIsSuccess(true);
-                // Refresh profile after successful registration
                 checkSellerProfile();
             } else {
                 Toast.show({
@@ -109,7 +112,6 @@ const BecomeSellerScreen = ({ navigation }: any) => {
         );
     }
 
-    // 1. Waiting Verification State
     if (sellerProfile && !sellerProfile.isVerified) {
         return (
             <SafeAreaView style={styles.container}>
@@ -139,59 +141,111 @@ const BecomeSellerScreen = ({ navigation }: any) => {
         );
     }
 
-    // 2. Dashboard/Detail State (Verified)
+    // 2. Dashboard/Detail State (Verified) - REDESIGNED
     if (sellerProfile && sellerProfile.isVerified) {
         return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Icon name="arrow-left" size={normalize(24)} color={COLORS.black} />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Seller Dashboard</Text>
+            <View style={styles.container}>
+                {/* Blue Header Section */}
+                <View style={styles.blueHeader}>
+                    <SafeAreaView>
+                        <View style={styles.headerNav}>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <Icon name="arrow-left" size={24} color={COLORS.white} />
+                            </TouchableOpacity>
+                            <Text style={styles.headerTitleWhite}>Toko Saya</Text>
+                            <TouchableOpacity onPress={() => Alert.alert('Info', 'Edit Profil Toko')}>
+                                <View style={styles.editIconCircle}>
+                                    <Icon name="edit-2" size={16} color={COLORS.primary} />
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.storeInfoContainer}>
+                            <Text style={styles.storeNameTitle}>{sellerProfile.storeName}</Text>
+                            <Text style={styles.storeAddressSubtitle}>{sellerProfile.address}</Text>
+                        </View>
+                    </SafeAreaView>
+
+                    {/* Background decorations could be added here */}
                 </View>
-                <ScrollView contentContainerStyle={styles.scrollContent}>
-                    <View style={styles.profileCard}>
-                        <View style={styles.profileHeader}>
-                            <View style={styles.avatarPlaceholder}>
-                                <Icon name="shopping-bag" size={30} color={COLORS.white} />
+
+                {/* Overlapping Card */}
+                <View style={styles.actionCardContainer}>
+                    <View style={styles.actionCard}>
+                        <TouchableOpacity
+                            style={styles.actionItem}
+                            onPress={() => navigation.navigate('SellerOrderCart')}
+                        >
+                            <View style={[styles.iconCircle, { backgroundColor: '#FFA726' }]}>
+                                <Icon name="shopping-cart" size={24} color={COLORS.white} />
                             </View>
-                            <View style={styles.profileInfo}>
-                                <Text style={styles.storeName}>{sellerProfile.storeName}</Text>
-                                <Text style={styles.storeAddress}>{sellerProfile.address}</Text>
-                                <View style={styles.ratingContainer}>
-                                    <Icon name="star" size={14} color="#FFD700" />
-                                    <Text style={styles.ratingText}>{sellerProfile.rating} / 5.0</Text>
+                            <Text style={styles.actionLabel}>Keranjang Pesanan</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.actionItem}
+                            onPress={() => navigation.navigate('AddProduct')}
+                        >
+                            <View style={[styles.iconCircle, { backgroundColor: '#26C6DA' }]}>
+                                <View style={styles.plusRing}>
+                                    <View style={styles.plusInner} />
+                                </View>
+                            </View>
+                            <Text style={styles.actionLabel}>Tambah Produk</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.actionItem}
+                            onPress={() => navigation.navigate('SellerOrderHistory')}
+                        >
+                            <View style={[styles.iconCircle, { backgroundColor: '#EF5350' }]}>
+                                <Icon name="file-text" size={24} color={COLORS.white} />
+                            </View>
+                            <Text style={styles.actionLabel}>Histori</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                {/* Content Below */}
+                <ScrollView contentContainerStyle={styles.dashboardContent}>
+                    {/* Mock Product Grid to match design */}
+                    <View style={styles.productGrid}>
+                        {/* Product Card Mockup */}
+                        <View style={styles.productCard}>
+                            <View style={styles.productImagePlaceholder} />
+                            <View style={styles.productInfo}>
+                                <TouchableOpacity
+                                    style={styles.editProductIcon}
+                                    onPress={() => navigation.navigate('EditProduct', {
+                                        product: {
+                                            id: 'mock_1',
+                                            name: 'Lorem ipsum dolor sit amet, consetetur sadips...',
+                                            price: 50000,
+                                            stock: 10,
+                                            category: 'Elektronik',
+                                            description: 'Mock description'
+                                        }
+                                    })}
+                                >
+                                    <Icon name="edit-2" size={12} color={COLORS.grey} />
+                                </TouchableOpacity>
+                                <Text style={styles.productName} numberOfLines={2}>
+                                    Lorem ipsum dolor sit amet, consetetur sadips...
+                                </Text>
+                                <Text style={styles.productPrice}>Rp 25.000</Text>
+                                <Text style={styles.productLocation}>{sellerProfile.address.split(',')[0]}</Text>
+                                <View style={styles.productRating}>
+                                    <Icon name="star" size={12} color="#FFD700" />
+                                    <Text style={styles.productRatingText}> 5.0 | Terjual 500+</Text>
                                 </View>
                             </View>
                         </View>
-                        <View style={styles.statsRow}>
-                            <View style={styles.statItem}>
-                                <Text style={styles.statValue}>{sellerProfile.totalProducts}</Text>
-                                <Text style={styles.statLabel}>Produk</Text>
-                            </View>
-                            <View style={styles.statItem}>
-                                <Text style={styles.statValue}>0</Text>
-                                <Text style={styles.statLabel}>Penjualan</Text>
-                            </View>
-                            <View style={styles.statItem}>
-                                <Text style={styles.statValue}>0</Text>
-                                <Text style={styles.statLabel}>Pengikut</Text>
-                            </View>
-                        </View>
-                    </View>
 
-                    <View style={styles.actionContainer}>
-                        <TouchableOpacity style={styles.actionBtn}>
-                            <Icon name="plus-circle" size={24} color={COLORS.white} />
-                            <Text style={styles.actionBtnText}>Tambah Produk</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.actionBtn, { backgroundColor: COLORS.secondary }]}>
-                            <Icon name="settings" size={24} color={COLORS.white} />
-                            <Text style={styles.actionBtnText}>Pengaturan Toko</Text>
-                        </TouchableOpacity>
+                        {/* Additional Mock Cards (invisible for layout balance if needed) */}
+                        <View style={[styles.productCard, { opacity: 0 }]} />
                     </View>
                 </ScrollView>
-            </SafeAreaView>
+            </View>
         );
     }
 
@@ -268,7 +322,6 @@ const BecomeSellerScreen = ({ navigation }: any) => {
                             numberOfLines={4}
                         />
 
-                        {/* Logo Upload Placeholder */}
                         <Text style={styles.label}>Logo Toko (Optional)</Text>
                         <TouchableOpacity
                             style={styles.uploadBtn}
@@ -310,12 +363,171 @@ const BecomeSellerScreen = ({ navigation }: any) => {
     );
 };
 
-// ... existing styles ...
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.white,
+        backgroundColor: '#FAFAFA', // Light grey background for dashboard
     },
+    // Blue Header Styles
+    blueHeader: {
+        backgroundColor: COLORS.primary,
+        height: normalize(200), // Adjust height as needed
+        paddingHorizontal: SPACING.md,
+        paddingTop: Platform.OS === 'android' ? SPACING.md : 0,
+        position: 'relative',
+    },
+    headerNav: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: SPACING.lg,
+    },
+    headerTitleWhite: {
+        fontSize: normalize(18),
+        fontWeight: 'bold',
+        color: COLORS.white,
+    },
+    editIconCircle: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: COLORS.white,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    storeInfoContainer: {
+        alignItems: 'center',
+        marginTop: SPACING.sm,
+    },
+    storeNameTitle: {
+        fontSize: normalize(24),
+        fontWeight: 'bold',
+        color: COLORS.white,
+        textAlign: 'center',
+    },
+    storeAddressSubtitle: {
+        fontSize: normalize(14),
+        color: COLORS.white,
+        opacity: 0.9,
+        marginTop: 4,
+        textAlign: 'center',
+    },
+    // Action Card Styles
+    actionCardContainer: {
+        paddingHorizontal: SPACING.md,
+        marginTop: -40, // Overlap the blue header
+        marginBottom: SPACING.md,
+    },
+    actionCard: {
+        backgroundColor: COLORS.white,
+        borderRadius: SIZES.radiusLg,
+        padding: SPACING.lg,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'flex-start',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    actionItem: {
+        alignItems: 'center',
+        width: '30%',
+    },
+    iconCircle: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    plusRing: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: COLORS.white,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    plusInner: {
+        width: 8,
+        height: 8,
+        backgroundColor: COLORS.white,
+        borderRadius: 4,
+    },
+    actionLabel: {
+        fontSize: normalize(12),
+        color: COLORS.black,
+        textAlign: 'center',
+        fontWeight: '500',
+    },
+    // Dashboard Content
+    dashboardContent: {
+        paddingHorizontal: SPACING.md,
+        paddingBottom: SPACING.xl,
+    },
+    productGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+    },
+    productCard: {
+        width: '48%',
+        backgroundColor: COLORS.white,
+        borderRadius: SIZES.radius,
+        padding: SPACING.sm,
+        marginBottom: SPACING.md,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    productImagePlaceholder: {
+        width: '100%',
+        height: normalize(120),
+        backgroundColor: '#EEE',
+        borderRadius: SIZES.radiusSm,
+        marginBottom: SPACING.sm,
+    },
+    productInfo: {
+        position: 'relative',
+    },
+    editProductIcon: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        zIndex: 1,
+    },
+    productName: {
+        fontSize: normalize(14),
+        color: COLORS.black,
+        marginBottom: 4,
+        paddingRight: 16, // Space for edit icon
+    },
+    productPrice: {
+        fontSize: normalize(14),
+        fontWeight: 'bold',
+        color: '#F44336', // Reddish price
+        marginBottom: 2,
+    },
+    productLocation: {
+        fontSize: normalize(10),
+        color: COLORS.grey,
+        marginBottom: 4,
+    },
+    productRating: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    productRatingText: {
+        fontSize: normalize(10),
+        color: COLORS.grey,
+    },
+    // ... Keeping Existing Registration Styles below ...
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -323,6 +535,7 @@ const styles = StyleSheet.create({
         height: normalize(56),
         borderBottomWidth: 1,
         borderBottomColor: COLORS.border,
+        backgroundColor: COLORS.white,
     },
     headerTitle: {
         fontSize: normalize(18),
@@ -369,6 +582,7 @@ const styles = StyleSheet.create({
         padding: SPACING.md,
         fontSize: normalize(14),
         color: COLORS.black,
+        backgroundColor: COLORS.white,
     },
     textArea: {
         height: normalize(100),
@@ -415,6 +629,7 @@ const styles = StyleSheet.create({
         padding: SPACING.md,
         borderTopWidth: 1,
         borderTopColor: COLORS.border,
+        backgroundColor: COLORS.white,
     },
     primaryBtn: {
         backgroundColor: COLORS.primary,
@@ -456,97 +671,6 @@ const styles = StyleSheet.create({
     centerContent: {
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    profileCard: {
-        backgroundColor: COLORS.white,
-        borderRadius: SIZES.radius,
-        padding: SPACING.md,
-        marginBottom: SPACING.md,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
-    },
-    profileHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: SPACING.lg,
-    },
-    avatarPlaceholder: {
-        width: normalize(60),
-        height: normalize(60),
-        borderRadius: normalize(30),
-        backgroundColor: COLORS.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    profileInfo: {
-        marginLeft: SPACING.md,
-        flex: 1,
-    },
-    storeName: {
-        fontSize: normalize(18),
-        fontWeight: 'bold',
-        color: COLORS.black,
-    },
-    storeAddress: {
-        fontSize: normalize(12),
-        color: COLORS.grey,
-        marginTop: 2,
-    },
-    ratingContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 4,
-    },
-    ratingText: {
-        fontSize: normalize(12),
-        color: COLORS.black,
-        fontWeight: 'bold',
-        marginLeft: 4,
-    },
-    statsRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderTopWidth: 1,
-        borderTopColor: COLORS.border,
-        paddingTop: SPACING.md,
-    },
-    statItem: {
-        alignItems: 'center',
-        flex: 1,
-    },
-    statValue: {
-        fontSize: normalize(16),
-        fontWeight: 'bold',
-        color: COLORS.black,
-    },
-    statLabel: {
-        fontSize: normalize(12),
-        color: COLORS.grey,
-        marginTop: 2,
-    },
-    actionContainer: {
-        marginTop: SPACING.md,
-    },
-    actionBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: COLORS.primary,
-        padding: SPACING.md,
-        borderRadius: SIZES.radius,
-        marginBottom: SPACING.md,
-    },
-    actionBtnText: {
-        color: COLORS.white,
-        fontWeight: 'bold',
-        fontSize: normalize(16),
-        marginLeft: SPACING.sm,
     },
 });
 
