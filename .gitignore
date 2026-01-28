@@ -77,3 +77,7 @@ yarn-error.log
 # env
 .env
 src/config/env.ts
+
+
+# google-services
+/android/app/google-services.json

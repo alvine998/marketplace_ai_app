@@ -230,9 +230,11 @@ const MainDrawer = () => {
     );
 };
 
+import { navigationRef } from './NavigationService';
+
 const RootNavigator = () => {
     return (
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
             <Stack.Navigator
                 initialRouteName="Splash"
                 screenOptions={{ headerShown: false }}

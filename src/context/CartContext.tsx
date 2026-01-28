@@ -1,5 +1,12 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { getCart, ApiCartItem } from '../services/cartService';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import {
+    getCart,
+    addToCart as apiAddToCart,
+    updateCartItem as apiUpdateCartItem,
+    removeFromCart as apiRemoveFromCart,
+    ApiCartItem,
+    AddToCartPayload,
+} from '../services/cartService';
 import { useAuth } from './AuthContext';
 
 export interface CartItem {
@@ -17,9 +24,9 @@ interface CartContextType {
     cartItems: CartItem[];
     isLoading: boolean;
     fetchCart: () => Promise<void>;
-    addToCart: (item: CartItem) => void;
-    removeFromCart: (id: string) => void;
-    updateQuantity: (id: string, quantity: number) => void;
+    addToCart: (productId: string, quantity?: number) => Promise<void>;
+    removeFromCart: (cartItemId: string) => Promise<void>;
+    updateQuantity: (cartItemId: string, quantity: number) => Promise<void>;
     clearCart: () => void;
     totalAmount: number;
     itemCount: number;
@@ -43,19 +50,23 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         shopName: apiItem.product.seller.username,
     });
 
-    const fetchCart = async () => {
+    const fetchCart = useCallback(async () => {
         if (!isLoggedIn || !user?.id) return;
 
         setIsLoading(true);
         try {
             const data = await getCart(user.id);
-            setCartItems(data.map(mapApiToCartItem));
+            if (Array.isArray(data)) {
+                setCartItems(data.map(mapApiToCartItem));
+            } else {
+                setCartItems([]);
+            }
         } catch (error) {
             console.error('Error fetching cart:', error);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [isLoggedIn, user?.id]);
 
     useEffect(() => {
         if (isLoggedIn) {
@@ -63,29 +74,96 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         } else {
             setCartItems([]);
         }
-    }, [isLoggedIn, user?.id]);
+    }, [isLoggedIn, user?.id, fetchCart]);
 
-    const addToCart = (newItem: CartItem) => {
-        setCartItems(prevItems => {
-            const existingItem = prevItems.find(item => item.id === newItem.id);
-            if (existingItem) {
-                return prevItems.map(item =>
-                    item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item
-                );
+    /**
+     * Add item to cart via API
+     * POST /cart with { productId, quantity }
+     */
+    const addToCart = async (productId: string, quantity: number = 1): Promise<void> => {
+        if (!isLoggedIn) {
+            console.warn('User must be logged in to add items to cart');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const payload: AddToCartPayload = { productId, quantity };
+            const updatedCart = await apiAddToCart(payload);
+
+            if (Array.isArray(updatedCart)) {
+                setCartItems(updatedCart.map(mapApiToCartItem));
+            } else {
+                // If API doesn't return updated cart, refetch
+                await fetchCart();
             }
-            return [...prevItems, { ...newItem, quantity: 1 }];
-        });
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const removeFromCart = (id: string) => {
-        setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+    /**
+     * Remove item from cart via API
+     * DELETE /cart/:id
+     */
+    const removeFromCart = async (cartItemId: string): Promise<void> => {
+        if (!isLoggedIn) {
+            console.warn('User must be logged in to remove items from cart');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            await apiRemoveFromCart(cartItemId);
+            // Update local state
+            setCartItems(prevItems => prevItems.filter(item => item.id !== cartItemId));
+        } catch (error) {
+            console.error('Error removing from cart:', error);
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const updateQuantity = (id: string, quantity: number) => {
-        if (quantity < 1) return;
-        setCartItems(prevItems =>
-            prevItems.map(item => (item.id === id ? { ...item, quantity } : item))
-        );
+    /**
+     * Update cart item quantity via API
+     * PUT /cart/:id with { quantity }
+     */
+    const updateQuantity = async (cartItemId: string, quantity: number): Promise<void> => {
+        if (!isLoggedIn) {
+            console.warn('User must be logged in to update cart');
+            return;
+        }
+
+        if (quantity < 1) {
+            // If quantity is less than 1, remove the item
+            await removeFromCart(cartItemId);
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const updatedItem = await apiUpdateCartItem(cartItemId, { quantity });
+
+            if (updatedItem) {
+                setCartItems(prevItems =>
+                    prevItems.map(item =>
+                        item.id === cartItemId ? { ...item, quantity: updatedItem.quantity } : item
+                    )
+                );
+            } else {
+                // If API doesn't return updated item, refetch
+                await fetchCart();
+            }
+        } catch (error) {
+            console.error('Error updating cart quantity:', error);
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const clearCart = () => setCartItems([]);

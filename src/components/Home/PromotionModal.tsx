@@ -20,16 +20,18 @@ interface PromotionModalProps {
     onClose: () => void;
     onPressCTA?: () => void;
     imageUrl?: string;
+    ctaText?: string;
 }
 
 const PromotionModal = ({
     visible,
     onClose,
     onPressCTA,
-    imageUrl = 'https://picsum.photos/seed/promo1/800/1200'
+    imageUrl = 'https://picsum.photos/seed/promo1/800/1200',
+    ctaText = 'Cek Sekarang'
 }: PromotionModalProps) => {
     const scaleAnim = React.useRef(new Animated.Value(0)).current;
-
+    console.log('imageUrl', imageUrl);
     React.useEffect(() => {
         if (visible) {
             Animated.spring(scaleAnim, {
@@ -75,7 +77,7 @@ const PromotionModal = ({
                             resizeMode="cover"
                         />
                         <View style={styles.ctaContainer}>
-                            <Text style={styles.ctaText}>Cek Sekarang</Text>
+                            <Text style={styles.ctaText}>{ctaText}</Text>
                             <Icon name="chevron-right" size={20} color={COLORS.white} />
                         </View>
                     </TouchableOpacity>

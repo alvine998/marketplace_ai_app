@@ -107,65 +107,60 @@ const PRODUCT_DATA = [
     }
 ];
 
+import { getPopupPromos, PopupPromo } from '../../services/promoService';
+
+// ... imports
+
 const HomeScreen = ({ navigation }: any) => {
     const { t } = useTranslation();
     const { isLoggedIn } = useAuth();
     const [isLoading, setIsLoading] = React.useState(true);
     const [refreshing, setRefreshing] = React.useState(false);
     const [promoVisible, setPromoVisible] = React.useState(false);
+    const [activePromo, setActivePromo] = React.useState<PopupPromo | null>(null);
     const [backPressCount, setBackPressCount] = React.useState(0);
 
     React.useEffect(() => {
-        // Simulate initial loading
-        const loadTimer = setTimeout(() => {
-            setIsLoading(false);
-        }, 1500);
+        // Load initial data
+        const loadData = async () => {
+            try {
+                // Simulate other data loading
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                setIsLoading(false);
 
-        return () => clearTimeout(loadTimer);
-    }, []);
+                // Fetch popup promos
+                const promos = await getPopupPromos(true);
 
-    React.useEffect(() => {
-        const backAction = () => {
-            if (isLoggedIn && navigation.isFocused()) {
-                if (backPressCount === 1) {
-                    BackHandler.exitApp();
-                    return true;
+                if (promos && promos.length > 0) {
+                    setActivePromo(promos[0]);
+                    setPromoVisible(true);
                 }
-
-                setBackPressCount(1);
-                if (Platform.OS === 'android') {
-                    ToastAndroid.show('Tekan sekali lagi untuk keluar', ToastAndroid.SHORT);
-                }
-
-                setTimeout(() => {
-                    setBackPressCount(0);
-                }, 2000);
-
-                return true;
+            } catch (error) {
+                console.error('Error loading home data:', error);
+                setIsLoading(false);
             }
-            return false;
         };
 
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            backAction,
-        );
-
-        return () => backHandler.remove();
-    }, [isLoggedIn, backPressCount, navigation]);
-
-    React.useEffect(() => {
-        const timer = setTimeout(() => {
-            setPromoVisible(true);
-        }, 1500);
-        return () => clearTimeout(timer);
+        loadData();
     }, []);
 
-    const onRefresh = React.useCallback(() => {
+    // ... back handler useEffect ...
+
+    // Removed hardcoded timer useEffect
+
+    const onRefresh = React.useCallback(async () => {
         setRefreshing(true);
-        setTimeout(() => {
+        try {
+            // Re-fetch promos on refresh if needed, or just wait
+            const promos = await getPopupPromos(true);
+            if (promos && promos.length > 0) {
+                setActivePromo(promos[0]);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
             setRefreshing(false);
-        }, 2000);
+        }
     }, []);
 
     const renderHeader = () => (
@@ -263,10 +258,13 @@ const HomeScreen = ({ navigation }: any) => {
             <PromotionModal
                 visible={promoVisible}
                 onClose={() => setPromoVisible(false)}
+                imageUrl={activePromo?.imageUrl}
                 onPressCTA={() => {
                     setPromoVisible(false);
-                    navigation.navigate('PromotionDetail');
+                    // Navigate to detail if needed, passing promo id
+                    navigation.navigate('PromotionDetail', { result: activePromo });
                 }}
+                ctaText={activePromo?.ctaText}
             />
         </View>
     );

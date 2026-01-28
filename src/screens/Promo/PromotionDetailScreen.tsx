@@ -8,6 +8,7 @@ import {
     SafeAreaView,
     Image,
     Dimensions,
+    ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { COLORS, SPACING, SIZES } from '../../utils/theme';
@@ -15,21 +16,70 @@ import normalize from 'react-native-normalize';
 
 const { width } = Dimensions.get('window');
 
+import { getPopupPromoById, PopupPromo } from '../../services/promoService';
+import { format } from 'date-fns';
+import { id as idLocale } from 'date-fns/locale';
+
 const PromotionDetailScreen = ({ navigation, route }: any) => {
-    // In a real app, we might pass data through route.params
-    const promoData = route.params?.promoData || {
-        id: 'promo-1',
-        title: 'Mega Sale Awal Tahun!',
-        description: 'Dapatkan diskon gila-gilaan hingga 80% untuk berbagai produk favoritmu. Mulai dari gadget, fashion, hingga kebutuhan rumah tangga. Jangan sampai ketinggalan!',
-        imageUrl: 'https://picsum.photos/seed/promo-detail/800/1200',
-        validUntil: '31 Januari 2026',
-        terms: [
-            'Berlaku untuk semua metode pembayaran.',
-            'Diskon maksimal Rp 500.000.',
-            'Minimal transaksi Rp 100.000.',
-            'Hanya berlaku di aplikasi Marketplace.',
-        ]
+    const { result, id: paramId } = route.params || {};
+    // Use object passed via result, or fetch by ID if only ID is passed
+    const passedPromo = result as PopupPromo | undefined;
+    const promoId = passedPromo?.id || paramId;
+
+    const [loading, setLoading] = React.useState(!passedPromo);
+    const [promoData, setPromoData] = React.useState<PopupPromo | null>(passedPromo || null);
+
+    React.useEffect(() => {
+        if (!passedPromo && promoId) {
+            fetchPromoDetails(promoId);
+        }
+    }, [promoId]);
+
+    const fetchPromoDetails = async (id: string) => {
+        setLoading(true);
+        try {
+            const data = await getPopupPromoById(id);
+            if (data) {
+                setPromoData(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch promo details:', error);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    if (loading) {
+        return (
+            <SafeAreaView style={[styles.container, styles.centerContent]}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+            </SafeAreaView>
+        );
+    }
+
+    if (!promoData) {
+        // Fallback or Error state
+        return (
+            <SafeAreaView style={[styles.container, styles.centerContent]}>
+                <Text style={styles.errorText}>Promo tidak ditemukan</Text>
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                    <Text>Kembali</Text>
+                </TouchableOpacity>
+            </SafeAreaView>
+        );
+    }
+
+    const formattedDate = promoData.endDate
+        ? format(new Date(promoData.endDate), 'd MMMM yyyy', { locale: idLocale })
+        : 'Seterusnya';
+
+    // Mock terms if not provided by API
+    const terms = [
+        'Berlaku untuk semua metode pembayaran.',
+        'Diskon maksimal Rp 500.000.',
+        'Minimal transaksi Rp 100.000.',
+        'Hanya berlaku di aplikasi Marketplace.',
+    ];
 
     return (
         <SafeAreaView style={styles.container}>
@@ -55,17 +105,19 @@ const PromotionDetailScreen = ({ navigation, route }: any) => {
                         <Text style={styles.promoTitle}>{promoData.title}</Text>
                         <View style={styles.validityBadge}>
                             <Icon name="clock" size={12} color={COLORS.grey} />
-                            <Text style={styles.validityText}>Berlaku s/d {promoData.validUntil}</Text>
+                            <Text style={styles.validityText}>Berlaku s/d {formattedDate}</Text>
                         </View>
                     </View>
 
                     <View style={styles.divider} />
 
                     <Text style={styles.sectionTitle}>Tentang Promo</Text>
-                    <Text style={styles.description}>{promoData.description}</Text>
+                    <Text style={styles.description}>
+                        {promoData.description || promoData.message || 'Nikmati promo spesial ini!'}
+                    </Text>
 
                     <Text style={[styles.sectionTitle, { marginTop: SPACING.lg }]}>Syarat & Ketentuan</Text>
-                    {promoData.terms.map((term: string, index: number) => (
+                    {terms.map((term: string, index: number) => (
                         <View key={index} style={styles.termItem}>
                             <View style={styles.dot} />
                             <Text style={styles.termText}>{term}</Text>
@@ -78,7 +130,7 @@ const PromotionDetailScreen = ({ navigation, route }: any) => {
 
             <View style={styles.bottomCta}>
                 <TouchableOpacity style={styles.usePromoBtn}>
-                    <Text style={styles.usePromoBtnText}>Cek Promo</Text>
+                    <Text style={styles.usePromoBtnText}>{promoData.ctaText || 'Cek Promo'}</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -195,6 +247,15 @@ const styles = StyleSheet.create({
         color: COLORS.white,
         fontWeight: 'bold',
         fontSize: normalize(16),
+    },
+    centerContent: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: {
+        fontSize: normalize(16),
+        color: COLORS.grey,
+        marginBottom: SPACING.md,
     },
 });
 

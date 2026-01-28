@@ -30,7 +30,29 @@ api.interceptors.request.use(
 // Response interceptor for handling errors
 api.interceptors.response.use(
   response => response,
-  error => {
+  async error => {
+    // Handle 401 Unauthorized
+    if (error.response && error.response.status === 401) {
+      // Avoid circular imports by requiring services inline if needed,
+      // or depend on the fact that NavigationService and authService imports are available.
+      // Here we need to import them at the top, or use a dynamic import/callback pattern.
+      // For simplicity, we'll assume we can import them.
+      // However, authService imports api, so we might have a circular dependency if we import authService here.
+      // To avoid this, we can clear storage manually and navigate.
+
+      try {
+        const AsyncStorage =
+          require('@react-native-async-storage/async-storage').default;
+        await AsyncStorage.multiRemove(['@auth_token', '@auth_user']);
+        delete api.defaults.headers.common['Authorization'];
+
+        const NavigationService = require('../navigation/NavigationService');
+        NavigationService.reset('Login');
+      } catch (e) {
+        console.error('Error handling 401:', e);
+      }
+    }
+
     // Handle common errors here
     if (error.response) {
       // Server responded with error status
